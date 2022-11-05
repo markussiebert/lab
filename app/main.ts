@@ -1,12 +1,12 @@
 import { Construct } from "constructs";
 import { App, TerraformOutput } from "cdktf";
-import * as proxmox from "./.gen/providers/proxmox";
-import * as unifi from "./.gen/providers/unifi";
-import * as local from './.gen/providers/local';
+import * as proxmox from "../.gen/providers/proxmox";
+import * as unifi from "../.gen/providers/unifi";
+import * as local from '../.gen/providers/local';
 import path = require("path");
-import { ProxmoxTalosVirtualMachine } from "./constructs/ProxmoxTalosVM";
-import { TalosCluster } from "./constructs/TalosCluster";
-import { RemoteBackendStack } from "./constructs/RemoteBackendStack";
+import { ProxmoxTalosVirtualMachine } from "../constructs/ProxmoxTalosVM";
+import { TalosCluster } from "../constructs/TalosCluster";
+import { RemoteBackendStack } from "../constructs/RemoteBackendStack";
 
 class SideroSingleNodeClusterStack extends RemoteBackendStack {
 
@@ -14,7 +14,7 @@ class SideroSingleNodeClusterStack extends RemoteBackendStack {
     
     super(scope, name, {
       remoteBackend: 'markussiebert/lab-sidero',
-      sopsSecretsFile: path.join(__dirname, 'secrets.sops.yaml'),
+      sopsSecretsFile: path.join(__dirname, '../secrets/secrets.sops.yaml'),
     });
 
     /**
@@ -79,7 +79,7 @@ class SideroSingleNodeClusterStack extends RemoteBackendStack {
     });
 
     new local.sensitiveFile.SensitiveFile(this, 'SideroTalosSingleNodeClusterKubeConfig', {
-      filename: path.join(__dirname, 'sidero-single-node.kubeconfig'),
+      filename: path.join(__dirname, '../kubeconfig/sidero-single-node'),
       content: sideroTalosClusterKubeConfig,
     })
 

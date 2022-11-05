@@ -1,6 +1,6 @@
 *.d.ts
 *.js
-*.kubeconfig
+kubeconfig
 node_modules
 cdktf.out
 cdktf.log
