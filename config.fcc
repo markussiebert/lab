@@ -1,7 +1,0 @@
-variant: fcos
-version: 1.4.0
-passwd:
-  users:
-    - name: root
-      ssh_authorized_keys:
-        - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDzNd6u/Qiv5oLKLhuVeAio0RZJtg6kyRu+B2aii/PIy server

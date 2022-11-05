@@ -1,0 +1,19 @@
+{
+  "language": "typescript",
+  "app": "npx ts-node main.ts",
+  "projectId": "4e2faf6f-b629-40a3-a67a-0ab6ce2a21d0",
+  "sendCrashReports": "true",
+  "terraformProviders": [
+    "siderolabs/talos@0.1.0-alpha.9",
+    "telmate/proxmox@2.9.11",
+    "paultyng/unifi@0.38.2",
+    "hashicorp/time@0.9.1",
+    "carlpett/sops@0.7.1",
+    "hashicorp/local@2.2.3",
+    "hashicorp/helm@2.7.1"],
+  "terraformModules": [],
+  "context": {
+    "excludeStackIdFromLogicalIds": "true",
+    "allowSepCharsInLogicalIds": "true"
+  }
+}
