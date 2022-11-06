@@ -12,7 +12,10 @@ export interface ProxmoxTalosVirtualMachineProps {
   readonly memory?: number;
   readonly storage?: number;
   readonly vlanTag?: number;
+  readonly boot?: string;
   readonly pause?: string;
+  readonly macAddress?: string;
+  readonly dependsOn?: ITerraformDependable[],
 }
 
 export class ProxmoxTalosVirtualMachine
@@ -41,7 +44,7 @@ export class ProxmoxTalosVirtualMachine
       iso: 'local:iso/talos-amd64-v1.2.3.iso',
       memory: (props.memory ?? 4) * 1024,
       cpu: 'kvm64',
-      boot: 'order=scsi0;ide2',
+      boot: props.boot,
       args: '-cpu kvm64,+cx16,+lahf_lm,+popcnt,+sse3,+ssse3,+sse4.1,+sse4.2',
       scsihw: 'virtio-scsi-pci',
       network: [
@@ -49,6 +52,7 @@ export class ProxmoxTalosVirtualMachine
           model: 'e1000',
           bridge: 'vmbr0',
           tag: props.vlanTag ?? 100,
+          macaddr: props.macAddress,
         },
       ],
       disk: [
@@ -58,6 +62,7 @@ export class ProxmoxTalosVirtualMachine
           type: 'scsi',
         },
       ],
+      dependsOn: props.dependsOn,
     });
 
     /**
@@ -65,9 +70,10 @@ export class ProxmoxTalosVirtualMachine
      */
 
     if (props.pause !== undefined) {
+      // TODO: Singleton pattern
       new time.provider.TimeProvider(this, 'ProviderTime4Pause');
       const sleepAfterVmCreate = new sleep.Sleep(this, 'Pause', {
-        createDuration: '3m',
+        createDuration: props.pause,
         dependsOn: [this.vmQemu],
       });
       this.fqn = sleepAfterVmCreate.fqn;

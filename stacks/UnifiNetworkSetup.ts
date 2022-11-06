@@ -20,14 +20,32 @@ export class UnifiNetworkSetup extends RemoteBackendStack {
             password: this.getSopsSecretValue('provider.unifi.password'),
         });
 
-        new unifi.network.Network(this, 'UnifiNetworkLab', {
-            name: 'lab',
-            purpose: 'corporate',
-            vlanId: 101,
-            
+        const unifiNetworkBase = new unifi.dataUnifiNetwork.DataUnifiNetwork(this, 'UnifiNetworkBase', {
+            name: 'ZuHause',
+        });
 
+        const unifiNetworkHomelab = new unifi.network.Network(this, 'UnifiNetworkLab', {
+            name: 'Homelab',
+            purpose: 'corporate',
+            vlanId: 100,
+            dhcpEnabled: true,
+            dhcpStart: '192.168.100.100',
+            dhcpStop: '192.168.100.200',
+            dhcpdBootEnabled: true,
+            dhcpdBootServer: '192.168.100.100',
+            dhcpdBootFilename: 'undionly.kpxe',
+            internetAccessEnabled: true,
+            subnet: '192.168.100.1/24',
+        })
+
+        new unifi.portProfile.PortProfile(this, 'UnifiPortProfileLab', {
+            autoneg: true,
+            name: 'ZuHause (Homelab allowed)',
+            nativeNetworkconfId: unifiNetworkBase.id,
+            taggedNetworkconfIds: [
+                unifiNetworkHomelab.id,
+            ],
+            poeMode: 'auto',
         })
     }
 }
-
-  

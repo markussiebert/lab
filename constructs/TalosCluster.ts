@@ -1,3 +1,4 @@
+import { ITerraformDependable } from 'cdktf';
 import { Construct } from 'constructs';
 import * as talos from '../.gen/providers/talos';
 
@@ -8,6 +9,7 @@ export interface TalosClusterProps {
    * The result will look like: https://${clusterEndpoint}:6443
    */
   readonly clusterEndpoint: string;
+  readonly dependsOn: ITerraformDependable[],
 }
 
 export interface TalosNode {
@@ -35,7 +37,10 @@ export class TalosCluster extends Construct {
 
     this.machineSecrets = new talos.machineSecrets.MachineSecrets(
       this,
-      'MachineSecrets'
+      'MachineSecrets',
+      {
+        dependsOn: props.dependsOn,
+      }
     ).machineSecrets;
 
     this.talosConfig = new talos.clientConfiguration.ClientConfiguration(

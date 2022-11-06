@@ -37,6 +37,13 @@ export class SideroSingleNodeClusterStack extends RemoteBackendStack {
       password: this.getSopsSecretValue('provider.unifi.password'),
     });
 
+    const unifiUserSidero = new unifi.user.User(this, 'SideroUnifiUser', {
+      mac: generateMac('sidero'),
+      name: 'sidero',
+      fixedIp: '192.168.100.100',
+      networkId: '6367f7463a35b0104f059d5b',
+    })
+
     /**
      * Local Provider
      */
@@ -51,27 +58,22 @@ export class SideroSingleNodeClusterStack extends RemoteBackendStack {
         memory: 4,
         vlanTag: 100,
         vmid: 100,
+        boot: 'order=scsi0;ide2',
         storage: 10,
-        pause: '3m',
-      }
-    );
-
-    const sideroVmUnifiUserData = new unifi.dataUnifiUser.DataUnifiUser(
-      this,
-      'SideroVirtualMachineUnifiUserData',
-      {
-        mac: sideroVm.getMacAddress(),
-        dependsOn: [sideroVm],
+        pause: '30s',
+        macAddress: generateMac('sidero'),
+        dependsOn: [unifiUserSidero]
       }
     );
 
     const sideroTalosCluster = new TalosCluster(this, 'SideroTalosCluster', {
-      clusterEndpoint: sideroVmUnifiUserData.ip,
+      clusterEndpoint: '192.168.100.100',
+      dependsOn: [sideroVm],
     });
 
     const sideroTalosClusterSingleNode = sideroTalosCluster.addControlPlaneNode(
       'SideroSingleNode',
-      sideroVmUnifiUserData.ip,
+      '192.168.100.100',
       'sidero'
     );
     sideroTalosCluster.bootStrap(sideroTalosClusterSingleNode);
@@ -84,7 +86,7 @@ export class SideroSingleNodeClusterStack extends RemoteBackendStack {
     });
 
     new TerraformOutput(this, 'Sidero.VirtualMachine.IpAddress', {
-      value: sideroVmUnifiUserData.ip,
+      value: '192.168.100.100',
     });
 
     new TerraformOutput(this, 'Sidero.Cluster.KubeConfig', {
@@ -106,14 +108,72 @@ export class SideroSingleNodeClusterStack extends RemoteBackendStack {
       dependsOn: [kubeconfig],
     });
 
-    new LocalExec(this, 'test', {
+    const clusterCtl = new LocalExec(this, 'test', {
       command: `clusterctl init -b talos -c talos -i sidero --kubeconfig  ${kubeconfig.filename}`,
       environment: {
         SIDERO_CONTROLLER_MANAGER_HOST_NETWORK: 'true',
-        SIDERO_CONTROLLER_MANAGER_API_ENDPOINT: sideroVmUnifiUserData.ip,
-        SIDERO_CONTROLLER_MANAGER_SIDEROLINK_ENDPOINT: sideroVmUnifiUserData.ip,
+        SIDERO_CONTROLLER_MANAGER_API_ENDPOINT: '192.168.100.100',
+        SIDERO_CONTROLLER_MANAGER_SIDEROLINK_ENDPOINT: '192.168.100.100',
       },
       dependsOn: [sleepBeforeInstallingSidero],
     });
+
+    new ProxmoxTalosVirtualMachine(
+      this,
+      'Node1',
+      {
+        name: 'node1',
+        cores: 2,
+        memory: 4,
+        vlanTag: 100,
+        vmid: 110,
+        boot: 'order=scsi0;net0',
+        storage: 10,
+        macAddress: generateMac('node1'),
+        dependsOn: [clusterCtl]
+      }
+    );
+
+    new ProxmoxTalosVirtualMachine(
+      this,
+      'Node2',
+      {
+        name: 'node2',
+        cores: 2,
+        memory: 4,
+        vlanTag: 100,
+        vmid: 112,
+        boot: 'order=scsi0;net0',
+        storage: 10,
+        macAddress: generateMac('node2'),
+        dependsOn: [clusterCtl]
+      }
+    );
+
+    new ProxmoxTalosVirtualMachine(
+      this,
+      'Node3',
+      {
+        name: 'node3',
+        cores: 2,
+        memory: 4,
+        vlanTag: 100,
+        vmid: 113,
+        boot: 'order=scsi0;net0',
+        storage: 10,
+        macAddress: generateMac('node3'),
+        dependsOn: [clusterCtl]
+      }
+    );
   }
+}
+
+function generateMac(input: string): string {
+
+  // from https://stackoverflow.com/questions/7616461/generate-a-hash-from-string-in-javascript
+  for( var i=0,h=9;i<input.length;) {
+      h=Math.imul(h^input.charCodeAt(i++),9**9);
+  }
+  
+  return `aaaa${ ((h^h>>>9) < 0 ? (h^h>>>9) * -1 : (h^h>>>9)).toString(16) }`.toUpperCase().match(/.{1,2}/g)!.join(':');
 }
