@@ -2,6 +2,7 @@
 *.js
 kubeconfig
 node_modules
+assets
 cdktf.out
 cdktf.log
 *terraform.*.tfstate*

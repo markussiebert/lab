@@ -10,7 +10,10 @@
     "hashicorp/time@0.9.1",
     "carlpett/sops@0.7.1",
     "hashicorp/local@2.2.3",
-    "hashicorp/helm@2.7.1"],
+    "hashicorp/random@3.4.3",
+    "hashicorp/kubernetes@2.15.0",
+    "hashicorp/tfe@0.38.0"
+  ],
   "terraformModules": [],
   "context": {
     "excludeStackIdFromLogicalIds": "true",
