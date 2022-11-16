@@ -2,7 +2,7 @@ import { Construct } from 'constructs';
 import { ITerraformDependable } from 'cdktf';
 import * as proxmox from '../.gen/providers/proxmox';
 import * as time from '../.gen/providers/time';
-import { RemoteBackendStack, RemoteBackendStackProps } from '../constructs/RemoteBackendStack';
+import { RemoteBackendStack, RemoteBackendStackProps } from '../constructs/CustomStack';
 import { MacAddress } from '../constructs/MacAddress';
 import { UnifiNetwork } from './UnifiNetworkSetupStack';
 import { VmQemu } from '../.gen/providers/proxmox/vm-qemu';

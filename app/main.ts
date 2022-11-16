@@ -1,7 +1,8 @@
 import { App } from 'cdktf';
 import path = require('path');
-import { RemoteBackendHandlerStack } from '../constructs/RemoteBackendHandlerStack';
+import { RemoteBackendHandlerStack } from '../constructs/CustomStack';
 import { download } from '../helper/Downloader';
+import { FluxCdStack } from '../stacks/FluxCdStack';
 import { ProxmoxVmStack, VirtualMachine } from '../stacks/ProxmoxVmStack';
 import { TalosClusterStack } from '../stacks/TalosClusterStack';
 import { UnifiNetworkSetupStack } from '../stacks/UnifiNetworkSetupStack';
@@ -28,7 +29,7 @@ const presetTalosVM = {
   boot: 'order=scsi0;ide2',
   pause: '30s',
 };
-const kubeConfigSideroMetal = path.join(
+const kubeconfigStageTalosCluster = path.join(
   __dirname,
   '../kubeconfig/stage-talos-cluster'
 );
@@ -116,13 +117,32 @@ const stackStageTalosCluster = new TalosClusterStack(
     clusterName: 'cluster-stage',
     clusterEndpoint: 'cluster-stage.lab.familie-siebert.de',
     vipIp: '192.168.100.10',
-    dependsOn: [stackStageTalosClusterVm],
   }
 );
+stackStageTalosCluster.addDependency(stackStageTalosClusterVm)
 
 const stageTalosClusterNodes = stageTalosClusterVMs.map(vm =>
   stackStageTalosCluster.addControlPlaneNode(vm.name, vm.fixedIp)
 );
 
-stageTalosClusterNodes.forEach( (node, index) => node.saveKubeConfig(`${kubeConfigSideroMetal}-${100+index}`));
+stageTalosClusterNodes.forEach( (node, index) => node.saveKubeConfig(`${kubeconfigStageTalosCluster}-${100+index}`));
+
+/**
+ * Install flux-cd
+ */
+
+const stageFluxCdStack = new FluxCdStack(app, 'StageFluxCDStack', {
+    remoteBackendOrganization: tfeOrg,
+    remoteBackendHandlerStack: stackRemoteBackendHandler,
+    sopsSecretsFile: sopsFile,
+    kubeconfigPath: `${kubeconfigStageTalosCluster}-100`,
+    githubBranch: 'stage',
+    githubOwner: 'markussiebert',
+    githubRepo: 'homelab-fluxcd',
+    githubTargetPath: 'stage',
+    environment: 'stage',
+});
+
+stageFluxCdStack.addDependency(stackStageTalosCluster);
+
 app.synth();

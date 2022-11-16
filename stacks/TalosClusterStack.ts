@@ -2,7 +2,7 @@ import { Construct } from 'constructs';
 import {
   RemoteBackendStackProps,
   RemoteBackendStack,
-} from '../constructs/RemoteBackendStack';
+} from '../constructs/CustomStack';
 import { ITerraformDependable, Lazy } from 'cdktf';
 import * as talos from '../.gen/providers/talos';
 import * as time from '../.gen/providers/time';
@@ -20,6 +20,7 @@ export interface TalosClusterStackProps extends RemoteBackendStackProps {
 }
 
 export class TalosClusterStack extends RemoteBackendStack {
+
   public readonly machineSecrets: string;
   public readonly talosConfig: string;
   public readonly clusterEndpoint: string;
@@ -29,6 +30,7 @@ export class TalosClusterStack extends RemoteBackendStack {
   public readonly bootStrap:talos.machineBootstrap.MachineBootstrap;
   public readonly vipIp:string;
   public readonly nodes:TalosNode[];
+
   constructor(scope: Construct, name: string, props: TalosClusterStackProps) {
     super(scope, name, props);
 

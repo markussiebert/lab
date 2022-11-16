@@ -1,15 +1,12 @@
-import { RemoteBackend, TerraformOutput, TerraformStack } from 'cdktf';
+import { App, RemoteBackend, TerraformStack } from 'cdktf';
 import { Construct } from 'constructs';
 import * as sops from '../.gen/providers/sops';
-import * as random from '../.gen/providers/random';
-import { RemoteBackendHandlerStack } from './RemoteBackendHandlerStack';
 import * as tfe from '../.gen/providers/tfe';
 
 export interface RemoteBackendStackProps {
   readonly remoteBackendOrganization: string;
   readonly remoteBackendWorkspace?: string;
   readonly sopsSecretsFile: string;
-  readonly dependsOn?: [RemoteBackendStack];
   readonly remoteBackendHandlerStack?: RemoteBackendHandlerStack;
 }
 
@@ -37,6 +34,7 @@ export class RemoteBackendStack extends TerraformStack {
           organization: this.remoteBackendOrganization,
         }
       );
+      this.addDependency(props.remoteBackendHandlerStack);
     }
 
     /**
@@ -63,36 +61,6 @@ export class RemoteBackendStack extends TerraformStack {
         sourceFile: props.sopsSecretsFile,
       }
     );
-
-    /**
-     * Stack Dependencies
-     */
-
-    new random.provider.RandomProvider(this, 'RandomProvider');
-    const dependsOn: RemoteBackendStack[] = [];
-
-    if (props.remoteBackendHandlerStack) {
-      dependsOn.push(props.remoteBackendHandlerStack);
-    }
-
-    if (props.dependsOn) {
-      dependsOn.concat(props.dependsOn);
-    }
-
-    if (dependsOn.length > 0) {
-      dependsOn.forEach(stack => {
-        const readinessBarrier = new random.id.Id(
-          stack,
-          `ReadinessBarrier->${this.stackName}`,
-          {
-            byteLength: 8,
-          }
-        );
-        new TerraformOutput(this, `ReadinessBarrier<-${stack.stackName}`, {
-          value: readinessBarrier.hex,
-        });
-      });
-    }
   }
 
   public getSopsSecretValue(accessor: string): string {
@@ -102,5 +70,16 @@ export class RemoteBackendStack extends TerraformStack {
     throw new Error(
       'Sops not initialized! You have to pass the path to the sopsfile via the StackProperties.'
     );
+  }
+}
+export class RemoteBackendHandlerStack extends RemoteBackendStack {
+  readonly stackName: string;
+
+  constructor(scope: App, name: string, props: RemoteBackendStackProps) {
+    super(scope, name, props);
+
+    this.stackName = name;
+
+    new tfe.provider.TfeProvider(this, 'TfeProvider');
   }
 }

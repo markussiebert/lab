@@ -3,7 +3,7 @@ import * as unifi from '../.gen/providers/unifi';
 import {
     RemoteBackendStackProps,
   RemoteBackendStack,
-} from '../constructs/RemoteBackendStack';
+} from '../constructs/CustomStack';
 import { NetworkConfig } from '../.gen/providers/unifi/network';
 
 export class UnifiNetworkSetupStack extends RemoteBackendStack {

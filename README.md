@@ -21,6 +21,7 @@ This is a work in progress project. Very early stage ...
 - Working unifi setup
 - Working dns server
 - Working proxmox hosts (with needed iso images)
+- Github Repo for flux with api token scoped to this repository
 
 ## What's working
 
