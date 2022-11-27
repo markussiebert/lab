@@ -91,16 +91,27 @@ export class FluxCdStack extends RemoteBackendStack {
     const installDocumentManifestIterator = TerraformIterator.fromList(installDocumentManifest.documents);
     const syncDocumentManifestIterator = TerraformIterator.fromList(syncDocumentManifest.documents);
 
+    const sopsSecret = new kubernetes.secret.Secret(this, 'SopsAgeKey', {
+        metadata: {
+            name: 'sops-age',
+            namespace:  'flux-system',
+        }, 
+        data: {
+            'age.age:key': this.getSopsSecretValue('flux.sops.age_key'),
+        },
+        dependsOn: [fluxCDNamespace],
+    });
+
     const manifestInstall = new kubectl.manifest.Manifest(this, 'ManifestInstall', {
         forEach: installDocumentManifestIterator,
         yamlBody: installDocumentManifestIterator.value,
-        dependsOn: [fluxCDNamespace]
+        dependsOn: [fluxCDNamespace, sopsSecret]
     });
 
     new kubectl.manifest.Manifest(this, 'ManifestSync', {
         forEach: syncDocumentManifestIterator,
         yamlBody: syncDocumentManifestIterator.value,
-        dependsOn: [fluxCDNamespace]
+        dependsOn: [fluxCDNamespace, sopsSecret]
     });
 
     new kubernetes.secret.Secret(this, 'FluxCdIdentitySecret', {
@@ -111,15 +122,16 @@ export class FluxCdStack extends RemoteBackendStack {
         data: {
             'identity': tlsPrivateKey.privateKeyPem,
             'identity.pub': tlsPrivateKey.publicKeyPem,
-            'known_osts': 'github.com ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBEmKSENjQEezOmxkZMy7opKgwFB9nkt5YRrYMjNuG5N87uRgg6CLrbo5wAdT/y6v0mKV0U2w0WZ2YB/++Tpockg='
+            'known_hosts': 'github.com ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBEmKSENjQEezOmxkZMy7opKgwFB9nkt5YRrYMjNuG5N87uRgg6CLrbo5wAdT/y6v0mKV0U2w0WZ2YB/++Tpockg='
         },
         dependsOn: [manifestInstall],
     });
-
+    
     new github.repositoryFile.RepositoryFile(this, 'GithubInstallContent', {
         repository: githubRepo.name,
         file: dataFluxInstall.path,
         content: dataFluxInstall.content,
+        overwriteOnCreate: true,
         branch: props.githubBranch,
     });
 
@@ -127,6 +139,7 @@ export class FluxCdStack extends RemoteBackendStack {
         repository: githubRepo.name,
         file: dataFluxSync.path,
         content: dataFluxSync.content,
+        overwriteOnCreate: true,
         branch: props.githubBranch,
     });
 
@@ -134,6 +147,7 @@ export class FluxCdStack extends RemoteBackendStack {
         repository: githubRepo.name,
         file: dataFluxSync.kustomizePath,
         content: dataFluxSync.kustomizeContent,
+        overwriteOnCreate: true,
         branch: props.githubBranch,
     });
 

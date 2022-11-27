@@ -1,89 +1,52 @@
 // Copyright (c) HashiCorp, Inc
 // SPDX-License-Identifier: MPL-2.0
+import { App, TerraformStack, Testing } from "cdktf";
 import "cdktf/lib/testing/adapters/jest"; // Load types for expect matchers
+import { MacAddress } from "../constructs/MacAddress";
+import { UnifiNetworkSetupStack } from "../stacks/UnifiNetworkSetupStack";
 // import { Testing } from "cdktf";
 
-describe("My CDKTF Application", () => {
-  // The tests below are example tests, you can find more information at
-  // https://cdk.tf/testing
-  it.todo("should be tested");
+describe("Test Helpers", () => {
+  it("should allways generate the same name", () => {
+    // given
+    const app = new App();
+    const stack = new TerraformStack(app, 'Stack');
 
-  // // All Unit tests test the synthesised terraform code, it does not create real-world resources
-  // describe("Unit testing using assertions", () => {
-  //   it("should contain a resource", () => {
-  //     // import { Image,Container } from "./.gen/providers/docker"
-  //     expect(
-  //       Testing.synthScope((scope) => {
-  //         new MyApplicationsAbstraction(scope, "my-app", {});
-  //       })
-  //     ).toHaveResource(Container);
+    // when
+    const mac1 = new MacAddress(stack, 'Mac1');
 
-  //     expect(
-  //       Testing.synthScope((scope) => {
-  //         new MyApplicationsAbstraction(scope, "my-app", {});
-  //       })
-  //     ).toHaveResourceWithProperties(Image, { name: "ubuntu:latest" });
-  //   });
-  // });
+    // then
+    expect( mac1.address ).toBe("AA:AA:53:6E:B4:6D");
+  });
 
-  // describe("Unit testing using snapshots", () => {
-  //   it("Tests the snapshot", () => {
-  //     const app = Testing.app();
-  //     const stack = new TerraformStack(app, "test");
+  it("should not accept the same name twice", () => {
+    // given
+    const app = new App();
+    const stack = new TerraformStack(app, 'Stack');
 
-  //     new TestProvider(stack, "provider", {
-  //       accessKey: "1",
-  //     });
+    // when
+    new MacAddress(stack, 'Mac1');
 
-  //     new TestResource(stack, "test", {
-  //       name: "my-resource",
-  //     });
+    // then
+    expect( () => { new MacAddress(stack, 'Mac1') } ).toThrow("There is already a Construct with name 'Mac1' in TerraformStack");
+  });
 
-  //     expect(Testing.synth(stack)).toMatchSnapshot();
-  //   });
+  it("test snapshot", () => {
+    // given
 
-  //   it("Tests a combination of resources", () => {
-  //     expect(
-  //       Testing.synthScope((stack) => {
-  //         new TestDataSource(stack, "test-data-source", {
-  //           name: "foo",
-  //         });
+    expect( 
+      Testing.synthScope((app) => {
+        const stack = new UnifiNetworkSetupStack(app, 'Stack', {
+          sopsSecretsFile: 'test',
+          remoteBackendOrganization: 'test',
+        });
+    
+        stack.addNetwork({
+          name: 'test',
+          purpose: 'test',
+        });
+      })
+    ).toMatchSnapshot();
 
-  //         new TestResource(stack, "test-resource", {
-  //           name: "bar",
-  //         });
-  //       })
-  //     ).toMatchInlineSnapshot();
-  //   });
-  // });
-
-  // describe("Checking validity", () => {
-  //   it("check if the produced terraform configuration is valid", () => {
-  //     const app = Testing.app();
-  //     const stack = new TerraformStack(app, "test");
-
-  //     new TestDataSource(stack, "test-data-source", {
-  //       name: "foo",
-  //     });
-
-  //     new TestResource(stack, "test-resource", {
-  //       name: "bar",
-  //     });
-  //     expect(Testing.fullSynth(app)).toBeValidTerraform();
-  //   });
-
-  //   it("check if this can be planned", () => {
-  //     const app = Testing.app();
-  //     const stack = new TerraformStack(app, "test");
-
-  //     new TestDataSource(stack, "test-data-source", {
-  //       name: "foo",
-  //     });
-
-  //     new TestResource(stack, "test-resource", {
-  //       name: "bar",
-  //     });
-  //     expect(Testing.fullSynth(app)).toPlanSuccessfully();
-  //   });
-  // });
+  });
 });
