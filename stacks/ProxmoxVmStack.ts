@@ -31,15 +31,24 @@ export class ProxmoxVmStack extends RemoteBackendStack {
 
   }
 
+  /**
+   * Adds a virtual machine to the current stack
+   */
   public addVirtualMachine(props: VirtualMachineProps): VirtualMachine {
     return new VirtualMachine(this, props);
   }
 }
 
 export interface VirtualMachineProps {
+    /**
+     * Name of the virtual machine
+     */
     readonly name: string;
     readonly unifiNetwork: UnifiNetwork;
     readonly fixedIp: string;
+    /**
+     * How many cores should the machine have?
+     */
     readonly cores?: number;
     readonly sockets?: number;
     readonly iso: string;

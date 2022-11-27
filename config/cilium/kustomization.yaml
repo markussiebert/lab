@@ -1,0 +1,15 @@
+resources:
+- cilium-manifest.yaml
+patchesJson6902:
+- target: 
+    name: ".*"
+  patch: |-
+    - op: add
+      path: /metadata/labels
+      value:
+        "app.kubernetes.io/managed-by": "Helm"
+    - op: add
+      path: /metadata/annotations
+      value:
+        "meta.helm.sh/release-name": "cilium"
+        "meta.helm.sh/release-namespace": "kube-system"

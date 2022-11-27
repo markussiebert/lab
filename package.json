@@ -24,7 +24,8 @@
     "cdk8s": ">=2.5.39",
     "cdktf": "^0.13.3",
     "cdktf-cdk8s": "^0.4.2",
-    "constructs": "^10.1.154"
+    "constructs": "^10.1.154",
+    "typedoc": "^0.23.21"
   },
   "devDependencies": {
     "@types/jest": "^29.2.2",

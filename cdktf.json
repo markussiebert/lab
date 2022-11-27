@@ -16,7 +16,9 @@
     "hashicorp/kubernetes@2.15.0",
     "gavinbunney/kubectl@1.14.0",
     "fluxcd/flux@0.20.0",
-    "hashicorp/tls@4.0.4"
+    "hashicorp/tls@4.0.4",
+    "hashicorp/aws@4.40.0",
+    "rancher/rancher2@1.25.0"
   ],
   "terraformModules": [],
   "context": {

@@ -45,3 +45,5 @@ This is a work in progress project. Very early stage ...
 Great Tool. ClusterAPI and PXE Boot work. But without professional server hardware (ipmi/bmc support) you have to reboot and configure the boot order manually. All in all no advantage over the “plain” terraform approach.
 
 There are things like virtual IPMI for Proxmox - but seams really dirty and you have to configure it for each vm - once again no advantage over sticking to plain terraform.
+
+For later: https://www.sidero.dev/v0.5/resource-configuration/servers/#pxebootalways

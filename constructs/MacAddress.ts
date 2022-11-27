@@ -16,7 +16,6 @@ export class MacAddress extends Construct {
    * Based on brycs answer 
    * on https://stackoverflow.com/questions/7616461/generate-a-hash-from-string-in-javascript
    */
-
   private generateMac(input: string): string {
 
 

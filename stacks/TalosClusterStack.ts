@@ -7,7 +7,8 @@ import { ITerraformDependable, Lazy } from 'cdktf';
 import * as talos from '../.gen/providers/talos';
 import * as time from '../.gen/providers/time';
 import * as local from '../.gen/providers/local';
-
+import * as fs from 'fs';
+import path = require('path');
 export interface TalosClusterStackProps extends RemoteBackendStackProps {
   /**
    * The hostname/ip this cluster will be reachable
@@ -100,23 +101,39 @@ export class TalosClusterStack extends RemoteBackendStack {
   }
 
   public addControlPlaneNode(name: string, endpoint: string): TalosNode {
+
+    const ciliumInlineManifest = fs.readFileSync(path.join(__dirname, '../config/cilium/final-cilium-manifest.yaml'))
+      .toString()
+      .split('\n')
+      // remove all comment lines, empty lines
+      .filter( (line) => (line.includes("# ") != true))
+      .filter( (line) => (line.charAt(line.length) != "#"))
+      .filter( (line) => (line != ""))
+      // indent and replace special characters
+     .map( (line) =>  `      ${line.split('${').join('$${')}`);
+
     const node = new TalosNode(this, `ControlPlaneNode-${name}`, 'ControlPlane', {
       endpoint: endpoint,
       machineConfiguration: this.machineConfigurationControlPlane,
       talosConfig: this.talosConfig,
       configPatches: [
         [
+          'cluster:',
+          '  inlineManifests:',
+          '  - name: clilium',
+          '    contents: |-',
+          // Prepare cilium inline manifest
+          ...ciliumInlineManifest,
           'machine:',
           '  install:',
           '    disk: /dev/sda',
           '  network:',
           `    hostname: ${name}`,
-          // TODO: Move to interface - vip 
           `    interfaces:`,
           `    - interface: eth0`,
           `      dhcp: true`,
           `      vip:`,
-          `        ip: ${this.vipIp}`, 
+          `        ip: ${this.vipIp}`,
         ].join('\n'),
         JSON.stringify([
           {
@@ -124,12 +141,69 @@ export class TalosClusterStack extends RemoteBackendStack {
             path: '/cluster/allowSchedulingOnControlPlanes',
             value: true,
           },
+          /**
+           * Prepare for OpenEBS JIVA
+           * https://www.talos.dev/v1.2/kubernetes-guides/configuration/replicated-local-storage-with-openebs-jiva/
+           */
+          {
+            op: 'add',
+            path: '/machine/install/extensions',
+            value: [
+              { 
+                image: 'ghcr.io/siderolabs/iscsi-tools:v0.1.1' 
+              }
+            ]
+          },
+          {
+            op: 'add',
+            path: '/machine/kubelet/extraMounts',
+            value: [
+              {
+                destination: '/var/openebs/local',
+                type: 'bind',
+                source: '/var/openebs/local',
+                options: [
+                  'bind',
+                  'rshared',
+                  'rw'
+                ]
+              }
+            ]
+          },
+          /**
+           * Switching to cilium
+           */
+          {
+            op: 'add',
+            path: '/cluster/network/cni',
+            value: {
+              name: 'none',
+            }
+          },
+          {
+            op: 'add',
+            path: '/cluster/proxy',
+            value: {
+              disabled: true,
+            }
+          },
         ]),
       ],
       nodeAttribute: endpoint,
     });
     this.nodes.push(node);
     return node;
+  }
+
+  public saveTalosConfig(filename: string) {
+    new local.sensitiveFile.SensitiveFile(
+      this,
+      'TalosConfig',
+      {
+        filename,
+        content: this.talosConfig,
+      }
+    );
   }
 }
 

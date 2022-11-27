@@ -34,6 +34,10 @@ const kubeconfigStageTalosCluster = path.join(
   '../kubeconfig/stage-talos-cluster'
 );
 
+const taloskonfigStageTalosCluster = path.join(
+  __dirname,
+  '../talosconfig/stage-talos-cluster'
+);
 /**
  * Prepare RemoteBackends
  */
@@ -77,7 +81,7 @@ const unifiNetworkHomelab = stackUnifiNetworkSetup.addNetwork({
 });
 
 /**
- * Prepare StageTalosCluster
+ * Prepare StageTalosCluster VMs
  */
 
 const stackStageTalosClusterVm = new ProxmoxVmStack(
@@ -90,13 +94,13 @@ const stackStageTalosClusterVm = new ProxmoxVmStack(
   }
 );
 
-const stageTalosClusterVMs = [100, 101, 102].map((num): VirtualMachine => {
+const stageTalosClusterVMs = [121, 122, 123].map((num): VirtualMachine => {
   return stackStageTalosClusterVm.addVirtualMachine({
     name: `stage-cluster-${num}`,
     vmid: num,
     cores: 2,
-    memory: 4,
-    storage: 10,
+    memory: 8,
+    storage: 50,
     fixedIp: `192.168.100.${num}`,
     unifiNetwork: unifiNetworkHomelab,
     ...presetTalosVM,
@@ -116,31 +120,31 @@ const stackStageTalosCluster = new TalosClusterStack(
     sopsSecretsFile: sopsFile,
     clusterName: 'cluster-stage',
     clusterEndpoint: 'cluster-stage.lab.familie-siebert.de',
-    vipIp: '192.168.100.10',
+    vipIp: '192.168.100.120',
   }
 );
 stackStageTalosCluster.addDependency(stackStageTalosClusterVm)
-
+stackStageTalosCluster.saveTalosConfig(taloskonfigStageTalosCluster)
 const stageTalosClusterNodes = stageTalosClusterVMs.map(vm =>
   stackStageTalosCluster.addControlPlaneNode(vm.name, vm.fixedIp)
 );
 
-stageTalosClusterNodes.forEach( (node, index) => node.saveKubeConfig(`${kubeconfigStageTalosCluster}-${100+index}`));
+stageTalosClusterNodes[0].saveKubeConfig(kubeconfigStageTalosCluster);
 
 /**
  * Install flux-cd
  */
 
 const stageFluxCdStack = new FluxCdStack(app, 'StageFluxCDStack', {
-    remoteBackendOrganization: tfeOrg,
-    remoteBackendHandlerStack: stackRemoteBackendHandler,
-    sopsSecretsFile: sopsFile,
-    kubeconfigPath: `${kubeconfigStageTalosCluster}-100`,
-    githubBranch: 'stage',
-    githubOwner: 'markussiebert',
-    githubRepo: 'homelab-fluxcd',
-    githubTargetPath: 'stage',
-    environment: 'stage',
+  remoteBackendOrganization: tfeOrg,
+  remoteBackendHandlerStack: stackRemoteBackendHandler,
+  sopsSecretsFile: sopsFile,
+  kubeconfigPath: kubeconfigStageTalosCluster,
+  githubBranch: 'stage',
+  githubOwner: 'markussiebert',
+  githubRepo: 'homelab-fluxcd',
+  githubTargetPath: 'cluster/stage',
+  environment: 'stage',
 });
 
 stageFluxCdStack.addDependency(stackStageTalosCluster);
