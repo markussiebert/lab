@@ -1,2 +1,0 @@
-NAME                    DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR   AGE
-openebs-jiva-csi-node   3         3         3       3            3           <none>          23h
