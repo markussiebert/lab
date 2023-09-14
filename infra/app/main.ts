@@ -6,8 +6,7 @@ import { ProxmoxVmStack } from '../stacks/ProxmoxVmStack';
 import { TalosClusterStack } from '../stacks/TalosClusterStack';
 //import { AdguardStack } from '../stacks/AdguardStack';
 import * as path from 'path';
-import { FluxCdPrepareStack } from '../stacks/FluxCdStack';
-//import { FluxCdStack } from '../stacks/FluxCdStack';
+import { FluxCdPrepareStack, FluxCdStack } from '../stacks/FluxCdStack';
 
 const app = new App();
 
@@ -140,23 +139,24 @@ const stackTalosStageCluster = new TalosClusterStack(
 );
 stackTalosStageCluster.addDependency(stackTalosVMs);
 //stackTalosStageCluster.addDependency(stackAdguard);
-stackTalosStageCluster.saveTalosConfig(path.join(__dirname, '../talosconfig/talos-stage'));
-stackTalosStageCluster.addControlPlaneNode(talosVM.name, talosVM.fixedIp).saveKubeConfig(path.join(__dirname, `../kubeconfig/talos-kubeconfig`));;
+stackTalosStageCluster.saveTalosConfig(path.join(__dirname, '../../connect/talosconfig/talos-stage'));
+stackTalosStageCluster.addControlPlaneNode(talosVM.name, talosVM.fixedIp).saveKubeConfig(path.join(__dirname, `../../connect/kubeconfig/talos-kubeconfig`));;
 
-new FluxCdPrepareStack(app, 'TalosFluxCdPrepare', {
+const fluxPrepare = new FluxCdPrepareStack(app, 'TalosFluxCdPrepare', {
   environment: 'main',
   githubRepoName: 'lab',
   remoteBackendHandlerStack,
 })
 
-//new FluxCdStack(app, 'TalosFluxCd', {
-//  environment: 'main',
-//  githubBranch: 'main',
-//  githubOwner: 'markussiebert',
-//  githubRepo: 'lab-gitops',
-//  githubTargetPath: 'main',
-//  kubeconfigPath: path.join(__dirname, `../kubeconfig/talos-kubeconfig`),
-//  remoteBackendHandlerStack,
-//}).addDependency(stackTalosStageCluster)
+new FluxCdStack(app, 'TalosFluxCd', {
+  environment: 'main',
+  githubBranch: 'main',
+  githubRepoOwner: 'markussiebert',
+  githubRepoName: 'lab-gitops',
+  githubTargetPath: 'flux/main',
+  tlsPrivateKey: fluxPrepare.tlsPrivateKey,
+  kubeconfigPath: path.join(__dirname, `../../connect/kubeconfig/talos-kubeconfig`),
+  remoteBackendHandlerStack,
+}).addDependency(stackTalosStageCluster)
 
 app.synth();
