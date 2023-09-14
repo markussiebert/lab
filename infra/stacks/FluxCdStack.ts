@@ -81,7 +81,7 @@ export class FluxCdStack extends RemoteBackendStack {
             configPath: props.kubeconfigPath,
         },
         git: {
-            url: `ssh://git@github.com/${props.githubRepoOwner}${props.githubRepoName}.git`,
+            url: `ssh://git@github.com/${props.githubRepoOwner}/${props.githubRepoName}.git`,
             ssh: {
                 username: 'git',
                 privateKey: props.tlsPrivateKey.privateKeyPem,

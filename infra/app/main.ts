@@ -147,16 +147,17 @@ const fluxPrepare = new FluxCdPrepareStack(app, 'TalosFluxCdPrepare', {
   githubRepoName: 'lab',
   remoteBackendHandlerStack,
 })
+fluxPrepare.addDependency(stackTalosStageCluster);
 
 new FluxCdStack(app, 'TalosFluxCd', {
   environment: 'main',
   githubBranch: 'main',
   githubRepoOwner: 'markussiebert',
-  githubRepoName: 'lab-gitops',
+  githubRepoName: 'lab',
   githubTargetPath: 'flux/main',
   tlsPrivateKey: fluxPrepare.tlsPrivateKey,
   kubeconfigPath: path.join(__dirname, `../../connect/kubeconfig/talos-kubeconfig`),
   remoteBackendHandlerStack,
-}).addDependency(stackTalosStageCluster)
+}).addDependency(fluxPrepare)
 
 app.synth();
