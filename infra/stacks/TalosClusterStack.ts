@@ -7,10 +7,8 @@ import { ITerraformDependable, Lazy } from 'cdktf';
 import * as talos from '../.gen/providers/talos';
 import * as time from '../.gen/providers/time';
 import * as local from '../.gen/providers/local';
-import * as fs from 'fs';
-import * as path from 'path';
-import { execFileSync } from 'child_process';
-
+import * as helm from '../.gen/providers/helm';
+import * as yaml from 'yaml';
 export interface TalosClusterStackProps extends RemoteBackendStackProps {
   /**
    * The hostname/ip this cluster will be reachable
@@ -103,27 +101,14 @@ export class TalosClusterStack extends RemoteBackendStack {
     );
     
     new time.sleep.Sleep(this, `MachineBootstrapSleep`, {
-      createDuration: '3m',
+      createDuration: '1m',
       dependsOn: [this.bootStrap],
     });
   }
 
-  public addControlPlaneNode(name: string, endpoint: string): TalosNode {
+  public addControlPlaneNode(name: string, endpoint: string, filename: string): TalosNode {
 
     this.endpoints.push(endpoint);
-    execFileSync('./create-cilium-yaml.sh', [this.vipIp], {
-      cwd: path.join(__dirname, '../hack/cilium/'),
-      shell: true,
-    });
-    const ciliumInlineManifest = fs.readFileSync(path.join(__dirname, '../hack/cilium/final-cilium-manifest.yaml'))
-      .toString()
-      .split('\n')
-      // remove all comment lines, empty lines
-      .filter( (line) => (line.includes("# ") != true))
-      .filter( (line) => (line.charAt(line.length) != "#"))
-      .filter( (line) => (line != ""))
-      // indent and replace special characters
-     .map( (line) =>  `      ${line.split('${').join('$${')}`);
 
     const node = new TalosNode(this, `ControlPlaneNode-${name}`, 'ControlPlane',  {
       endpoint: endpoint,
@@ -131,12 +116,6 @@ export class TalosClusterStack extends RemoteBackendStack {
       machineConfigurationInput: this.machineConfigurationControlPlane.machineConfiguration,
       configPatches: [
         [
-          'cluster:',
-          '  inlineManifests:',
-          '  - name: clilium',
-          '    contents: |-',
-          // Prepare cilium inline manifest
-          ...ciliumInlineManifest,
           'machine:',
           '  install:',
           '    disk: /dev/sda',
@@ -211,7 +190,7 @@ export class TalosClusterStack extends RemoteBackendStack {
         ]),
       ],
       nodeAttribute: endpoint,
-    });
+    }, filename);
     if (this.nodes.length > 0) {
       node.node.addDependency(this.nodes[this.nodes.length-1].node);
     }
@@ -219,8 +198,8 @@ export class TalosClusterStack extends RemoteBackendStack {
     return node;
   }
 
-  public saveTalosConfig(filename: string) {
-    new local.sensitiveFile.SensitiveFile(
+  public saveTalosConfig(filename: string): local.sensitiveFile.SensitiveFile {
+    return new local.sensitiveFile.SensitiveFile(
       this,
       'TalosConfig',
       {
@@ -229,6 +208,58 @@ export class TalosClusterStack extends RemoteBackendStack {
         content: this.talosConfig.talosConfig,
       }
     );
+  }
+
+  public setupCilium(filename: string) {
+    new helm.provider.HelmProvider(this, 'helm', {
+      kubernetes: {
+        configPath: filename
+      }
+    })
+
+    new helm.release.Release(this, 'Cilium', {
+      chart: 'cilium',
+      repository: 'https://helm.cilium.io/',
+      version: '1.13.8',
+      name: 'cilium',
+      namespace: 'kube-system',
+      values:[yaml.stringify({
+        ipam: {
+          mode: 'kubernetes',
+        },
+        kubeProxyReplacement: 'strict',
+        k8sServiceHost: 'localhost',
+        k8sServicePort: '7445',
+        hubble: {
+          relay: {
+            enabled: false,
+          },
+          ui: {
+            enabled: false,
+          }
+        },
+        securityContext: {
+          capabilities: {
+            ciliumAgent: ["CHOWN","KILL","NET_ADMIN","NET_RAW","IPC_LOCK","SYS_ADMIN","SYS_RESOURCE","DAC_OVERRIDE","FOWNER","SETGID","SETUID"],
+            cleanCiliumState: ["NET_ADMIN","SYS_ADMIN","SYS_RESOURCE"],
+          },
+        },
+        cgroup: {
+          autoMount: {
+            enabled: false,
+          },
+          hostRoot: "/sys/fs/cgroup",
+        },
+        operator: {
+          replicas: '1',
+        },
+      })],
+      dependsOn: this.nodes,
+      lifecycle: {
+        ignoreChanges: "all",
+      } 
+    });
+    ;
   }
 }
 
@@ -241,6 +272,7 @@ export class TalosNode extends Construct implements ITerraformDependable {
     name: string,
     public readonly type: 'Worker' | 'ControlPlane',
     config: talos.machineConfigurationApply.MachineConfigurationApplyConfig,
+    filename: string,
   ) {
     super(scope, name);
     this.clientConfiguration = config.clientConfiguration;
@@ -251,17 +283,7 @@ export class TalosNode extends Construct implements ITerraformDependable {
         config
       );
     this.fqn = this.appliedMachineConfiguration.fqn;
-  }
 
-  public getKubeConfig(): string {
-    return new talos.dataTalosClusterKubeconfig.DataTalosClusterKubeconfig(this, `KubeConfigData`, {
-      clientConfiguration: this.clientConfiguration,
-      endpoint: this.appliedMachineConfiguration.endpoint,
-      nodeAttribute: this.appliedMachineConfiguration.nodeAttribute
-    }).kubeconfigRaw;
-  }
-
-  public saveKubeConfig(filename: string) {
     new local.sensitiveFile.SensitiveFile(
       this,
       `KubeConfigSave`,
@@ -270,5 +292,13 @@ export class TalosNode extends Construct implements ITerraformDependable {
         content: this.getKubeConfig(),
       }
     );
+  }
+
+  public getKubeConfig(): string {
+    return new talos.dataTalosClusterKubeconfig.DataTalosClusterKubeconfig(this, `KubeConfigData`, {
+      clientConfiguration: this.clientConfiguration,
+      endpoint: this.appliedMachineConfiguration.endpoint,
+      nodeAttribute: this.appliedMachineConfiguration.nodeAttribute
+    }).kubeconfigRaw;
   }
 }

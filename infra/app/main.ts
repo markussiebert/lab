@@ -40,7 +40,6 @@ const unifiNetworkHomelab = stackUnifiNetworkSetup.addNetwork({
   dhcpStart: '192.168.10.10',
   dhcpStop: '192.168.10.200',
   dhcpdBootEnabled: false,
-  dhcpDns: ['192.168.1.10'],
   dhcpV6Start: '::2',
   dhcpV6Stop: '::7d1',
   ipv6PdStart: '::2',
@@ -93,7 +92,8 @@ const stackTalosStageCluster = new TalosClusterStack(
 );
 stackTalosStageCluster.addDependency(stackTalosVMs);
 stackTalosStageCluster.saveTalosConfig(path.join(__dirname, '../../connect/talosconfig/talos-stage'));
-stackTalosStageCluster.addControlPlaneNode(talosVM.name, talosVM.fixedIp).saveKubeConfig(path.join(__dirname, `../../connect/kubeconfig/talos-kubeconfig`));;
+stackTalosStageCluster.addControlPlaneNode(talosVM.name, talosVM.fixedIp, path.join(__dirname, `../../connect/kubeconfig/talos-kubeconfig`));
+stackTalosStageCluster.setupCilium(path.join(__dirname, `../../connect/kubeconfig/talos-kubeconfig`));
 
 const fluxPrepare = new FluxCdPrepareStack(app, 'TalosFluxCdPrepare', {
  environment: 'main',
@@ -107,7 +107,7 @@ new FluxCdStack(app, 'TalosFluxCd', {
  githubBranch: 'main',
  githubRepoOwner: 'markussiebert',
  githubRepoName: 'lab',
- githubTargetPath: 'flux/main',
+ githubTargetPath: 'flux/stage',
  tlsPrivateKey: fluxPrepare.tlsPrivateKey,
  kubeconfigPath: path.join(__dirname, `../../connect/kubeconfig/talos-kubeconfig`),
  remoteBackendHandlerStack,

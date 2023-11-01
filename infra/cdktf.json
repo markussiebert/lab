@@ -13,6 +13,7 @@
     "hashicorp/local@2.2.3",
     "hashicorp/random@3.4.3",
     "hashicorp/tfe@0.38.0",
+    "hashicorp/helm@2.11.0",
     "integrations/github@5.25.0",
     "hashicorp/kubernetes@2.20.0",
     "gavinbunney/kubectl@1.14.0",
