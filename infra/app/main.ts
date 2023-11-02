@@ -108,5 +108,6 @@ fluxCdStack.addDependency(stackTalosStageCluster)
 
 new FluxCdSecretStack(app, 'TalosFluxCdSecrets', {
   kubeconfigPath: path.join(__dirname, `../../connect/kubeconfig/talos-kubeconfig`),
+  remoteBackendHandlerStack,
 }).addDependency(fluxCdStack)
 app.synth();
