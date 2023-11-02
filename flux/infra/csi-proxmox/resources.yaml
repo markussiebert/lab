@@ -8,6 +8,28 @@ metadata:
     pod-security.kubernetes.io/audit: privileged
     pod-security.kubernetes.io/warn: privileged
 ---
+# Workaround as described here:
+# https://github.com/fluxcd/flux2/issues/2330#issuecomment-1735574192
+# as flux won't merge values / valuesFrom as one would expect
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: csi-proxmox-values
+  namespace: infra-csi-proxmox
+data:
+  values.yaml: |
+    config:
+      clusters:
+        - url: https://192.168.10.10:8006/api2/json
+          insecure: true
+          token_id: "kubernetes-csi@pve!csi"
+          region: default
+    storageClass:
+      - name: proxmox-data-xfs
+        storage: data
+        reclaimPolicy: Delete
+        fstype: xfs
+---
 apiVersion: source.toolkit.fluxcd.io/v1beta2
 kind: HelmRepository
 metadata:
@@ -33,20 +55,11 @@ spec:
         kind: HelmRepository
         name: csi-proxmox
         namespace: infra-csi-proxmox
-      interval: 1h
-  values:
-    config:
-      clusters:
-        - url: https://192.168.10.10:8006/api2/json
-          insecure: true
-          token_id: "kubernetes-csi@pve!csi"
-          region: default
-    storageClass:
-      - name: proxmox-data-xfs
-        storage: data
-        reclaimPolicy: Delete
-        fstype: xfs
+      interval: 1h    
   valuesFrom:
+    - kind: ConfigMap
+      name: csi-proxmox-values
+      valuesKey: values.yaml
     - kind: Secret
       name: proxmox-credentials
       valuesKey: token_secret
