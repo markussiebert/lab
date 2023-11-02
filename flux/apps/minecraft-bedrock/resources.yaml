@@ -36,6 +36,8 @@ spec:
   values:
     workloadAsStatefulSet: true
     strategyType: RollingUpdate
+    serviceType: LoadBalancer
+    loadBalancerIP: '192.168.10.22'
     persistence:
       storageClass: proxmox-data-xfs
       dataDir:
