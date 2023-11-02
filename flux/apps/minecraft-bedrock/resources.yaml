@@ -35,6 +35,7 @@ spec:
       interval: 1h
   values:
     workloadAsStatefulSet: true
+    strategyType: RollingUpdate
     persistence:
       storageClass: proxmox-data-xfs
       dataDir:
