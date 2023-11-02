@@ -4,7 +4,7 @@ import { RemoteBackendHandlerStack } from '../constructs/CustomStack';
 import { UnifiNetworkSetupStack } from '../stacks/UnifiNetworkSetupStack';
 import { ProxmoxVmStack } from '../stacks/ProxmoxVmStack';
 import { TalosClusterStack } from '../stacks/TalosClusterStack';
-import { FluxCdStack } from '../stacks/FluxCdStack';
+import { FluxCdSecretStack, FluxCdStack } from '../stacks/FluxCdStack';
 
 const app = new App();
 
@@ -95,7 +95,7 @@ stackTalosStageCluster.saveTalosConfig(path.join(__dirname, '../../connect/talos
 stackTalosStageCluster.addControlPlaneNode(talosVM.name, talosVM.fixedIp, path.join(__dirname, `../../connect/kubeconfig/talos-kubeconfig`));
 stackTalosStageCluster.setupCilium(path.join(__dirname, `../../connect/kubeconfig/talos-kubeconfig`));
 
-new FluxCdStack(app, 'TalosFluxCd', {
+const fluxCdStack = new FluxCdStack(app, 'TalosFluxCd', {
  environment: 'main',
  githubBranch: 'main',
  githubRepoOwner: 'markussiebert',
@@ -103,6 +103,10 @@ new FluxCdStack(app, 'TalosFluxCd', {
  githubTargetPath: 'flux/stage',
  kubeconfigPath: path.join(__dirname, `../../connect/kubeconfig/talos-kubeconfig`),
  remoteBackendHandlerStack,
-}).addDependency(stackTalosStageCluster)
+})
+fluxCdStack.addDependency(stackTalosStageCluster)
 
+new FluxCdSecretStack(app, 'TalosFluxCdSecrets', {
+  kubeconfigPath: path.join(__dirname, `../../connect/kubeconfig/talos-kubeconfig`),
+}).addDependency(fluxCdStack)
 app.synth();

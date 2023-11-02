@@ -21,7 +21,7 @@ spec:
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: proxmox-csi-plugin
+  name: csi-proxmox
   namespace: infra-csi-proxmox
 spec:
   interval: 30m

@@ -10,9 +10,11 @@ import * as tls from '../.gen/providers/tls';
 import * as time from '../.gen/providers/time';
 
 
-
-export interface FluxCdStackProps extends RemoteBackendStackProps {
+export interface FluxCdStackKubConfigProps extends RemoteBackendStackProps {
   readonly kubeconfigPath?: string;
+}
+
+export interface FluxCdStackProps extends FluxCdStackKubConfigProps {
   readonly environment: string;
   readonly githubRepoName: string;
   readonly githubTargetPath: string;
@@ -89,16 +91,27 @@ export class FluxCdStack extends RemoteBackendStack {
     dependsOn: [sleep],
   });
 
-  //new kubernetes.secret.Secret(this, 'SopsAgeKey', {
-  //    metadata: {
-  //        name: 'sops-age',
-  //        namespace:  'flux-system',
-  //    },
-  //    data: {
-  //        'age.agekey': this.getSopsSecretValue('flux.sops.age_key'),
-  //    },
-  //    dependsOn: [bs],
-  //});
+
   
+  }
+}
+
+export class FluxCdSecretStack extends RemoteBackendStack {
+  constructor(scope: Construct, name: string, props: FluxCdStackKubConfigProps) {
+    super(scope, name, props);
+
+    new kubernetes.provider.KubernetesProvider(this, 'KubernetesProvider', {
+      configPath: props.kubeconfigPath,
+    });
+
+    new kubernetes.secret.Secret(this, 'SopsAgeKey', {
+        metadata: {
+            name: 'sops-age',
+            namespace:  'flux-system',
+        },
+        data: {
+            'age.agekey': this.getSopsSecretValue('flux.sops.age_key'),
+        },
+    });
   }
 }
