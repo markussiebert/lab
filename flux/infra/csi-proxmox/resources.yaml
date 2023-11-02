@@ -1,0 +1,36 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: infra-csi-proxmox
+  labels:
+    pod-security.kubernetes.io/enforce: privileged
+    pod-security.kubernetes.io/audit: privileged
+    pod-security.kubernetes.io/warn: privileged
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: HelmRepository
+metadata:
+  name: csi-proxmox
+  namespace: infra-csi-proxmox
+spec:
+  type: oci
+  interval: 1h
+  url:  oci://ghcr.io/sergelogvinov/charts/proxmox-csi-plugin
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: proxmox-csi-plugin
+  namespace: infra-csi-proxmox
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: proxmox-csi-plugin
+      version: "0.4.0"
+      sourceRef:
+        kind: HelmRepository
+        name: csi-proxmox
+        namespace: infra-csi-proxmox
+      interval: 1h

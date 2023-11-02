@@ -89,19 +89,20 @@ export class FluxCdStack extends RemoteBackendStack {
         }
     });
     
-    const bs = new flux.bootstrapGit.BootstrapGit(this, 'FluxGitBootstrap', {
+    new flux.bootstrapGit.BootstrapGit(this, 'FluxGitBootstrap', {
         path: props.githubTargetPath,
     });
 
-    new kubernetes.secret.Secret(this, 'SopsAgeKey', {
-        metadata: {
-            name: 'sops-age',
-            namespace:  'flux-system',
-        },
-        data: {
-            'age.agekey': this.getSopsSecretValue('flux.sops.age_key'),
-        },
-        dependsOn: [bs],
-    });
+    //new kubernetes.secret.Secret(this, 'SopsAgeKey', {
+    //    metadata: {
+    //        name: 'sops-age',
+    //        namespace:  'flux-system',
+    //    },
+    //    data: {
+    //        'age.agekey': this.getSopsSecretValue('flux.sops.age_key'),
+    //    },
+    //    dependsOn: [bs],
+    //});
+    
   }
 }

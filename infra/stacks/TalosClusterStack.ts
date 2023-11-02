@@ -133,38 +133,6 @@ export class TalosClusterStack extends RemoteBackendStack {
             path: '/cluster/allowSchedulingOnControlPlanes',
             value: true,
           },
-          /**
-           * Prepare for OpenEBS JIVA
-           * https://www.talos.dev/v1.2/kubernetes-guides/configuration/replicated-local-storage-with-openebs-jiva/
-           */
-          //{
-          //  op: 'add',
-          //  path: '/machine/install/extensions',
-          //  value: [
-          //    { 
-          //      image: 'ghcr.io/siderolabs/iscsi-tools:v0.1.1' 
-          //    }
-          //  ]
-          //},
-          //{
-          //  op: 'add',
-          //  path: '/machine/kubelet/extraMounts',
-          //  value: [
-          //    {
-          //      destination: '/var/openebs/local',
-          //      type: 'bind',
-          //      source: '/var/openebs/local',
-          //      options: [
-          //        'bind',
-          //        'rshared',
-          //        'rw'
-          //      ]
-          //    }
-          //  ]
-          //},
-          /**
-           * Switching to cilium
-           */
           {
             op: 'add',
             path: '/cluster/network/cni',
