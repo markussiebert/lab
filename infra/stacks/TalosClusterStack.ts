@@ -119,6 +119,10 @@ export class TalosClusterStack extends RemoteBackendStack {
           'machine:',
           '  install:',
           '    disk: /dev/sda',
+          // Add nodeLabels to use proxmox csi
+          '  nodeLabels:',
+          '    topology.kubernetes.io/region: default',
+          '    topology.kubernetes.io/zone: default',
           '  network:',
           `    hostname: ${name}`,
           `    interfaces:`,
