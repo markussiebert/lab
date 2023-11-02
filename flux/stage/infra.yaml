@@ -10,3 +10,16 @@ spec:
   secretRef:
     name: flux-system
   url: ssh://git@github.com/markussiebert/lab.git
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: infra
+  namespace: flux-system
+spec:
+  prune: true
+  interval: 1m
+  sourceRef:
+    kind: GitRepository
+    name: lab
+  path: ./flux/infra
