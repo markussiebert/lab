@@ -34,5 +34,13 @@ spec:
         namespace: app-minecraft-bedrock
       interval: 1h
   values:
+    workloadAsStatefulSet: true
+    persistence:
+      storageClass: proxmox-data-xfs
+      dataDir:
+        # Set this to false if you don't care to persist state between restarts.
+        enabled: true
+        # existingClaim: nil
+        Size: 1Gi
     minecraftServer:
       eula: true
