@@ -7,12 +7,9 @@ import * as flux from '../.gen/providers/flux';
 import * as github from '../.gen/providers/github';
 import * as kubernetes from '../.gen/providers/kubernetes';
 import * as tls from '../.gen/providers/tls';
+import * as time from '../.gen/providers/time';
 
 
-export interface FluxCdPrepareStackProps extends RemoteBackendStackProps {
-  readonly environment: string;
-  readonly githubRepoName: string;
-}
 
 export interface FluxCdStackProps extends RemoteBackendStackProps {
   readonly kubeconfigPath?: string;
@@ -21,14 +18,11 @@ export interface FluxCdStackProps extends RemoteBackendStackProps {
   readonly githubTargetPath: string;
   readonly githubRepoOwner: string;
   readonly githubBranch: string;
-  readonly tlsPrivateKey: tls.privateKey.PrivateKey;
 }
 
-export class FluxCdPrepareStack extends RemoteBackendStack {
+export class FluxCdStack extends RemoteBackendStack {
 
-  public tlsPrivateKey: tls.privateKey.PrivateKey;
-
-  constructor(scope: Construct, name: string, props: FluxCdPrepareStackProps) {
+  constructor(scope: Construct, name: string, props: FluxCdStackProps) {
     super(scope, name, props);
     /**
      * Generate TLS KeyPair
@@ -36,7 +30,7 @@ export class FluxCdPrepareStack extends RemoteBackendStack {
 
     new tls.provider.TlsProvider(this, 'TlsProvider');
 
-    this.tlsPrivateKey = new tls.privateKey.PrivateKey(this, 'TlsPrivateKey', {
+    const tlsPrivateKey = new tls.privateKey.PrivateKey(this, 'TlsPrivateKey', {
       algorithm: 'ECDSA',
       ecdsaCurve: 'P256',
     });
@@ -51,58 +45,60 @@ export class FluxCdPrepareStack extends RemoteBackendStack {
     });
   
     const deployKey = new github.repositoryDeployKey.RepositoryDeployKey(
-        this,
-        'GithubDeployKey',
-        {
-          title: `flux-${props.environment}`,
-          repository: props.githubRepoName,
-          key: this.tlsPrivateKey.publicKeyOpenssh,
-          readOnly: false,
-        }
-      );
-      deployKey.node.addDependency(this.tlsPrivateKey);
-  }
-}
+      this,
+      'GithubDeployKey',
+      {
+        title: `flux-${props.environment}`,
+        repository: props.githubRepoName,
+        key: tlsPrivateKey.publicKeyOpenssh,
+        readOnly: false,
+        dependsOn: [tlsPrivateKey]
+      }
+    );
 
-export class FluxCdStack extends RemoteBackendStack {
-  constructor(scope: Construct, name: string, props: FluxCdStackProps) {
-    super(scope, name, props);
+    new time.provider.TimeProvider(this, 'ProviderTime4Pause');
+
+    const sleep = new time.sleep.Sleep(this, `sleep`, {
+      createDuration: '30s',
+      dependsOn: [deployKey],
+    });
 
     new kubernetes.provider.KubernetesProvider(this, 'KubernetesProvider', {
       configPath: props.kubeconfigPath,
     });
 
-    /**
-     * Bootstrap Flux
-     */
+  /**
+   * Bootstrap Flux
+   */
 
-    new flux.provider.FluxProvider(this, 'FluxProvider', {
-        kubernetes: {
-            configPath: props.kubeconfigPath,
-        },
-        git: {
-            url: `ssh://git@github.com/${props.githubRepoOwner}/${props.githubRepoName}.git`,
-            ssh: {
-                username: 'git',
-                privateKey: props.tlsPrivateKey.privateKeyPem,
-            }
-        }
-    });
-    
-    new flux.bootstrapGit.BootstrapGit(this, 'FluxGitBootstrap', {
-        path: props.githubTargetPath,
-    });
+  new flux.provider.FluxProvider(this, 'FluxProvider', {
+      kubernetes: {
+          configPath: props.kubeconfigPath,
+      },
+      git: {
+          url: `ssh://git@github.com/${props.githubRepoOwner}/${props.githubRepoName}.git`,
+          ssh: {
+              username: 'git',
+              privateKey: tlsPrivateKey.privateKeyPem,
+          }
+      }
+  });
+  
+  new flux.bootstrapGit.BootstrapGit(this, 'FluxGitBootstrap', {
+    path: props.githubTargetPath,
+    dependsOn: [sleep],
+  });
 
-    //new kubernetes.secret.Secret(this, 'SopsAgeKey', {
-    //    metadata: {
-    //        name: 'sops-age',
-    //        namespace:  'flux-system',
-    //    },
-    //    data: {
-    //        'age.agekey': this.getSopsSecretValue('flux.sops.age_key'),
-    //    },
-    //    dependsOn: [bs],
-    //});
-    
+  //new kubernetes.secret.Secret(this, 'SopsAgeKey', {
+  //    metadata: {
+  //        name: 'sops-age',
+  //        namespace:  'flux-system',
+  //    },
+  //    data: {
+  //        'age.agekey': this.getSopsSecretValue('flux.sops.age_key'),
+  //    },
+  //    dependsOn: [bs],
+  //});
+  
   }
 }
