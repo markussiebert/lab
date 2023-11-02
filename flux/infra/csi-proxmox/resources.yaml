@@ -26,7 +26,7 @@ data:
           region: default
     storageClass:
       - name: proxmox-data-xfs
-        storage: data
+        storage: vm-storage
         reclaimPolicy: Delete
         fstype: xfs
 ---
