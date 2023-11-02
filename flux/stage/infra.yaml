@@ -4,7 +4,9 @@ metadata:
   name: infra
   namespace: flux-system
 spec:
+  prune: true
+  interval: 1m
   sourceRef:
     kind: GitRepository
-    name: app
+    name: flux-system
   path: ./flux/infra
