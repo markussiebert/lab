@@ -20,7 +20,7 @@ data:
   values.yaml: |
     config:
       clusters:
-        - url: https://pve.familie-siebert.de:8006/api2/json
+        - url: https://192.168.10.10:8006/api2/json
           insecure: true
           token_id: "kubernetes-csi@pve!csi"
           region: pve-cluster
