@@ -34,3 +34,20 @@ spec:
         name: csi-proxmox
         namespace: infra-csi-proxmox
       interval: 1h
+    values:
+      config:
+        clusters:
+          - url: https://192.168.10.10:8006/api2/json
+            insecure: true
+            token_id: "kubernetes-csi@pve!csi"
+            region: Region-1
+      storageClass:
+        - name: proxmox-data-xfs
+          storage: data
+          reclaimPolicy: Delete
+          fstype: xfs
+    valuesFrom:
+    - kind: Secret
+      name: proxmox-credentials
+      valuesKey: token_secret
+      targetPath: config.clusters[0].token_secret
