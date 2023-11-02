@@ -41,6 +41,7 @@ metadata:
   namespace: infra-metallb
 spec:
   addresses:
+  - 192.168.1.222/32
   - 192.168.10.21/32
   - 192.168.10.22/32
   - 192.168.10.23/32
