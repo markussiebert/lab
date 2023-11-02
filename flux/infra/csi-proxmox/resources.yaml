@@ -27,6 +27,8 @@ data:
     storageClass:
       - name: proxmox-data-xfs
         storage: vm-storage
+        ssd: true
+        cache: none
         reclaimPolicy: Delete
         fstype: xfs
 ---
