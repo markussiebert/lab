@@ -40,7 +40,7 @@ spec:
         - url: https://192.168.10.10:8006/api2/json
           insecure: true
           token_id: "kubernetes-csi@pve!csi"
-          region: Region-1
+          region: default
     storageClass:
       - name: proxmox-data-xfs
         storage: data
