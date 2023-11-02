@@ -23,7 +23,7 @@ data:
         - url: https://pve.familie-siebert.de:8006/api2/json
           insecure: true
           token_id: "kubernetes-csi@pve!csi"
-          region: pve
+          region: pve-cluster
     storageClass:
       - name: proxmox-data-xfs
         storage: vm-storage
