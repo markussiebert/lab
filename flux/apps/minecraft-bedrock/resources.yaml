@@ -1,0 +1,38 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: app-minecraft-bedrock
+  labels:
+    pod-security.kubernetes.io/enforce: privileged
+    pod-security.kubernetes.io/audit: privileged
+    pod-security.kubernetes.io/warn: privileged
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: HelmRepository
+metadata:
+  name: minecraft-bedrock
+  namespace: app-minecraft-bedrock
+spec:
+  interval: 1h
+  url:  https://itzg.github.io/minecraft-server-charts/
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: minecraft-bedrock
+  namespace: app-minecraft-bedrock
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: minecraft-bedrock
+      version: "2.4.0"
+      sourceRef:
+        kind: HelmRepository
+        name: minecraft-bedrock
+        namespace: app-minecraft-bedrock
+      interval: 1h
+  values:
+    minecraftServer:
+      eula: true

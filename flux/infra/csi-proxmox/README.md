@@ -1,3 +1,7 @@
+# Install the proxmox-csi to use proxmox volumes in k8s
+
+https://github.com/sergelogvinov/proxmox-csi-plugin
+
 # Run this on proxmox to create credentials
 
 ```bash
