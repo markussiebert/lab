@@ -46,5 +46,7 @@ spec:
     minecraftServer:
       eula: true
       enableLanVisibility: true
-      serviceType: LoadBalancer
-      loadBalancerIP: '192.168.1.221'
+      viewDistance: 15
+      serviceType: NodePort
+      nodePort: 19132
+      #loadBalancerIP: '192.168.1.221'
