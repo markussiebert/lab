@@ -45,5 +45,6 @@ spec:
         Size: 1Gi
     minecraftServer:
       eula: true
+      enableLanVisibility: true
       serviceType: LoadBalancer
       loadBalancerIP: '192.168.1.221'
