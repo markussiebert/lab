@@ -46,6 +46,7 @@ spec:
     minecraftServer:
       eula: true
       enableLanVisibility: true
+      serverName: SibisWelt
       viewDistance: 15
       serviceType: LoadBalancer
       #nodePort: 19132
