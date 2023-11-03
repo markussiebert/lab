@@ -47,6 +47,6 @@ spec:
       eula: true
       enableLanVisibility: true
       viewDistance: 15
-      serviceType: NodePort
-      nodePort: 19132
-      #loadBalancerIP: '192.168.1.221'
+      serviceType: LoadBalancer
+      #nodePort: 19132
+      loadBalancerIP: '192.168.1.221'
