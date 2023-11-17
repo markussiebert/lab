@@ -51,3 +51,57 @@ spec:
       serviceType: LoadBalancer
       #nodePort: 19132
       loadBalancerIP: '192.168.1.221'
+---
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: app-minecraft-bedrock-priv
+  labels:
+    pod-security.kubernetes.io/enforce: privileged
+    pod-security.kubernetes.io/audit: privileged
+    pod-security.kubernetes.io/warn: privileged
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: HelmRepository
+metadata:
+  name: minecraft-bedrock
+  namespace: app-minecraft-bedrock-priv
+spec:
+  interval: 1h
+  url:  https://itzg.github.io/minecraft-server-charts/
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: minecraft-bedrock
+  namespace: app-minecraft-bedrock-priv
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: minecraft-bedrock
+      version: "2.4.0"
+      sourceRef:
+        kind: HelmRepository
+        name: minecraft-bedrock
+        namespace: app-minecraft-bedrock
+      interval: 1h
+  values:
+    workloadAsStatefulSet: true
+    strategyType: RollingUpdate
+    persistence:
+      storageClass: proxmox-data-xfs
+      dataDir:
+        # Set this to false if you don't care to persist state between restarts.
+        enabled: true
+        # existingClaim: nil
+        Size: 1Gi
+    minecraftServer:
+      eula: true
+      enableLanVisibility: true
+      serverName: SibisWeltPriv
+      viewDistance: 15
+      serviceType: LoadBalancer
+      #nodePort: 19132
+      loadBalancerIP: '192.168.1.222'
