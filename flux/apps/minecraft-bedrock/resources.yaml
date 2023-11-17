@@ -98,10 +98,12 @@ spec:
         # existingClaim: nil
         Size: 1Gi
     minecraftServer:
+      levelSeed: 2218715947278290213
       eula: true
       enableLanVisibility: true
       serverName: SibisWeltPriv
       viewDistance: 15
       serviceType: LoadBalancer
       #nodePort: 19132
+      
       loadBalancerIP: '192.168.1.222'
