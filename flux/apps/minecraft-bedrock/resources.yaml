@@ -102,7 +102,7 @@ spec:
         # existingClaim: nil
         Size: 1Gi
     minecraftServer:
-      levelSeed: '-7783854906403730143'
+      levelSeed: '259097770644189520'
       eula: true
       enableLanVisibility: true
       serverName: SibisWeltPriv
