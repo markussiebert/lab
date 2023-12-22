@@ -53,14 +53,6 @@ spec:
           # Automatically creating the library volume is not supported by this chart
           # You have to specify an existing PVC to use
           existingClaim: immich-data-dir
-      ingress:
-        main:
-          enabled: true
-          hosts:
-            - host: immich.stage.familie-siebert.de
-              paths:
-                - path: "/"
-          tls: []
     postgresql:
       enabled: true
       image:
@@ -91,7 +83,15 @@ spec:
       enabled: true
       image:
         repository: ghcr.io/immich-app/immich-server
-        pullPolicy: IfNotPresent     
+        pullPolicy: IfNotPresent
+      ingress:
+        main:
+          enabled: true
+          hosts:
+            - host: immich.stage.familie-siebert.de
+              paths:
+                - path: "/"
+          tls: []
     ingress:
       main:
         enabled: false
