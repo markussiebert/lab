@@ -44,3 +44,8 @@ spec:
       hostRoot: "/sys/fs/cgroup"
     operator:
       replicas: '1'
+    l2announcements:
+      enabled: true
+    k8sClientRateLimit:
+      qps: {QPS}
+      burst: {BURST}
