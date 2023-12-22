@@ -1,0 +1,111 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: app-immich
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: immich-data-dir
+  namespace: app-immich
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 64Gi
+  storageClassName: proxmox-data-xfs
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: HelmRepository
+metadata:
+  name: immich
+  namespace: app-immich
+spec:
+  interval: 1h
+  url: https://immich-app.github.io/immich-charts
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: immich
+  namespace: app-immich
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: immich
+      version: "0.3.0"
+      sourceRef:
+        kind: HelmRepository
+        name: immich
+        namespace: app-immich
+      interval: 1h
+  values:
+    immich:
+      persistence:
+        # Main data store for all photos shared between different components.
+        library:
+          # Automatically creating the library volume is not supported by this chart
+          # You have to specify an existing PVC to use
+          existingClaim: immich-data-dir
+    postgresql:
+      enabled: true
+      image:
+        repository: tensorchord/pgvecto-rs
+        tag: pg14-v0.1.11
+      global:
+        postgresql:
+          auth:
+            username: immich
+            database: immich
+            password: immich
+      primary:
+        initdb:
+          scripts:
+            create-extensions.sql: |
+              CREATE EXTENSION cube;
+              CREATE EXTENSION earthdistance;
+              CREATE EXTENSION vectors;
+    redis:
+      enabled: true
+      architecture: standalone
+      auth:
+        enabled: false
+    server:
+      enabled: true
+      image:
+        repository: ghcr.io/immich-app/immich-server
+        pullPolicy: IfNotPresent     
+    ingress:
+      main:
+        enabled: false
+        annotations:
+          # proxy-body-size is set to 0 to remove the body limit on file uploads
+          nginx.ingress.kubernetes.io/proxy-body-size: "0"
+        hosts:
+          - host: immich.local
+            paths:
+              - path: "/"
+        tls: []
+    microservices:
+      enabled: true
+      image:
+        repository: ghcr.io/immich-app/immich-server
+        pullPolicy: IfNotPresent
+    machine-learning:
+      enabled: true
+      image:
+        repository: ghcr.io/immich-app/immich-machine-learning
+        pullPolicy: IfNotPresent
+      env:
+        TRANSFORMERS_CACHE: /cache
+      persistence:
+        cache:
+          enabled: true
+          size: 8Gi
+          # Optional: Set this to pvc to avoid downloading the ML models every start.
+          type: pvc
+          accessMode: ReadWriteOnce
+          storageClass: proxmox-data-xfs
