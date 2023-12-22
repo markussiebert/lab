@@ -21,6 +21,6 @@ spec:
         values:
           - "true"
   interfaces:
-  - ^en.*
+  - .*
   externalIPs: true
   loadBalancerIPs: true
