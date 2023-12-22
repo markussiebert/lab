@@ -43,6 +43,7 @@ spec:
         namespace: app-immich
       interval: 1h
   values:
+  # https://github.com/immich-app/immich-charts/blob/main/charts/immich/values.yaml
     global:
       storageClass: proxmox-data-xfs
     immich:
@@ -52,6 +53,14 @@ spec:
           # Automatically creating the library volume is not supported by this chart
           # You have to specify an existing PVC to use
           existingClaim: immich-data-dir
+      ingress:
+        main:
+          enabled: false
+          hosts:
+            - host: immich.stage.familie-siebert.de
+              paths:
+                - path: "/"
+          tls: []
     postgresql:
       enabled: true
       image:
