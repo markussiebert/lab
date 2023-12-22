@@ -47,6 +47,9 @@ spec:
     l2announcements:
       enabled: true
       interface: eth0
+      leaseDuration: 3s
+      leaseRenewDeadline: 1s
+      leaseRetryPeriod: 200ms
     k8sClientRateLimit:
-      qps: "{QPS}"
-      burst: "{BURST}"
+      qps: 5
+      burst: 10
