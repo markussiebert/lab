@@ -27,6 +27,7 @@ spec:
     ipam:
       mode: 'kubernetes'           
     kubeProxyReplacement: true
+    devices: eth+
     k8sServiceHost: 'localhost'
     k8sServicePort: '7445'
     hubble:
