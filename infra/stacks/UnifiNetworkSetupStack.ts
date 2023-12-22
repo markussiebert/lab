@@ -57,6 +57,10 @@ export interface UnifiNetworkClientProps {
    * A fixed IPv4 address for the client.
    */
   readonly fixedIp?: string;
+  /**
+   * Specifies the local DNS record for this user.
+   */
+  readonly localDnsRecord?: string;
 }
 export class UnifiNetwork extends Construct {
   public readonly unifiNetwork: unifi.network.Network;
@@ -73,6 +77,7 @@ export class UnifiNetwork extends Construct {
       name: props.name,
       fixedIp: props.fixedIp,
       networkId: this.unifiNetwork.id,
+      localDnsRecord: props.localDnsRecord,
     });
   }
 }

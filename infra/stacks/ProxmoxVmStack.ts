@@ -131,7 +131,12 @@ export class VirtualMachine extends Construct implements ITerraformDependable {
                 replicate: 0,
               },
             ],
+            lifecycle: {
+              ignoreChanges: ['disk']
+            }
         });
+
+        new Disk()
 
         const sleepAfterVmCreate = new time.sleep.Sleep(this, `VmQemu-${props.name}-Sleep`, {
             createDuration: props.pause ?? '30s',

@@ -46,6 +46,7 @@ spec:
       replicas: '1'
     l2announcements:
       enabled: true
+      interface: eth0
     k8sClientRateLimit:
       qps: {QPS}
       burst: {BURST}

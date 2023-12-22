@@ -32,7 +32,27 @@ const stackUnifiNetworkSetup = new UnifiNetworkSetupStack(
   }
 );
 
-const unifiNetworkHomelab = stackUnifiNetworkSetup.addNetwork({
+const unifiNetworkHome = stackUnifiNetworkSetup.addNetwork({
+  name: 'ZuHause',
+  purpose: 'corporate',
+  dhcpEnabled: true,
+  dhcpStart: '192.168.1.20',
+  dhcpStop: '192.168.1.200',
+  dhcpdBootEnabled: false,
+  dhcpV6Start: '::2',
+  dhcpV6Stop: '::7d1',
+  ipv6PdStart: '::2',
+  ipv6PdStop: '::7d1',
+  ipv6RaPriority: 'high',
+  ipv6RaEnable: true,
+  ipv6RaValidLifetime: 0,
+  multicastDns: true,
+  internetAccessEnabled: true,
+  domainName: 'localdomain',
+  subnet: '192.168.1.1/24',
+})
+
+stackUnifiNetworkSetup.addNetwork({
   name: 'HomeLab',
   purpose: 'corporate',
   vlanId: 10,
@@ -49,11 +69,12 @@ const unifiNetworkHomelab = stackUnifiNetworkSetup.addNetwork({
   subnet: '192.168.10.1/24',
 });
 
-unifiNetworkHomelab.addClient({
-  name: 'pve',
-  mac: '1c:83:4f:ff:fc:c2',
-  fixedIp: '192.168.10.10',
-});
+//unifiNetworkHome.addClient({
+//  name: 'pve',
+//  mac: '1c:83:4f:ff:fc:c2',
+//  fixedIp: '192.168.1.15',
+//  localDnsRecord: 'pve.familie-siebert.de'
+//});
 
 /**
  * Prepare Talos VM
@@ -72,11 +93,11 @@ stackTalosVMs.addDependency(stackUnifiNetworkSetup);
 const talosVM = stackTalosVMs.addVirtualMachine({
  name: `talos`,
  vmid: 120,
- fixedIp: `192.168.10.20`,
+ fixedIp: `192.168.1.220`,
  cores: 4,
  memory: 16,
  storage: 8,
- unifiNetwork: unifiNetworkHomelab,
+ unifiNetwork: unifiNetworkHome,
  boot: 'order=scsi0;ide2',
  iso: 'local:iso/metal-amd64.iso',
  pause: '60s',
@@ -85,7 +106,7 @@ const talosVM = stackTalosVMs.addVirtualMachine({
 const stackTalosStageCluster = new TalosClusterStack(
  app,
  'TalosStageCluster', {
-   vipIp: '192.168.10.20', // now the one and only host ip
+   vipIp: '192.168.1.220', // now the one and only host ip
    clusterName: 'talos',
    remoteBackendHandlerStack,
  },
