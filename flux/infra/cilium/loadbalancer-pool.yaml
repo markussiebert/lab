@@ -14,13 +14,13 @@ kind: CiliumL2AnnouncementPolicy
 metadata:
   name: one-policy
 spec:
-  serviceSelector:
-    matchLabels:
-      cilium-lb-ip-pool: one-ip-pool
   nodeSelector:
-    matchLabels:
-      kubernetes.io/os: linux
+    matchExpressions:
+      - key: node-role.kubernetes.io/control-plane
+        operator: In 
+        values:
+          - "true"
   interfaces:
-  - ^eth[0-9]+
+  - eth0
   externalIPs: true
   loadBalancerIPs: true
