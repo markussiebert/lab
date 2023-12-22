@@ -17,6 +17,9 @@ spec:
   serviceSelector:
     matchLabels:
       cilium-lb-ip-pool: one-ip-pool
+  nodeSelector:
+    matchLabels:
+      kubernetes.io/os: linux
   interfaces:
   - ^eth[0-9]+
   externalIPs: true
