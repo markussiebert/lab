@@ -48,5 +48,5 @@ spec:
       enabled: true
       interface: eth0
     k8sClientRateLimit:
-      qps: {QPS}
-      burst: {BURST}
+      qps: "{QPS}"
+      burst: "{BURST}"
