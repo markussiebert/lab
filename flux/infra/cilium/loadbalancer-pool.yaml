@@ -21,6 +21,6 @@ spec:
         values:
           - "true"
   interfaces:
-  - ^eth[0-9]+
+  - ^en.*
   externalIPs: true
   loadBalancerIPs: true

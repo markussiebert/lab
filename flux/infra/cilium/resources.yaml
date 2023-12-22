@@ -27,6 +27,7 @@ spec:
     ipam:
       mode: 'kubernetes'           
     kubeProxyReplacement: true
+    # our device has name like device=enxaaaa173980a1
     devices: en.*
     k8sServiceHost: 'localhost'
     k8sServicePort: '7445'
