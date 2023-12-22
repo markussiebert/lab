@@ -50,5 +50,5 @@ spec:
       leaseRenewDeadline: 1s
       leaseRetryPeriod: 200ms
     k8sClientRateLimit:
-      qps: 5
-      burst: 10
+      qps: 10
+      burst: 20
