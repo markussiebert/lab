@@ -4,4 +4,4 @@ resources:
 #- metallb
 - csi-proxmox
 - traefik
-- cilium-config
+- cilium
