@@ -5,3 +5,6 @@ metadata:
 spec:
   cidrs:
   - cidr: "192.168.1.224/28"
+  serviceSelector:
+    matchLabels:
+      cilium-lb-ip-pool: one-ip-pool
