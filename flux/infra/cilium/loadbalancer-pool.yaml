@@ -21,6 +21,6 @@ spec:
         values:
           - "true"
   interfaces:
-  - .*
+  - enxaaaa.* 
   externalIPs: true
   loadBalancerIPs: true
