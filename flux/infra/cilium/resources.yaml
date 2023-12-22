@@ -46,9 +46,11 @@ spec:
       replicas: '1'
     l2announcements:
       enabled: true
-      leaseDuration: 3s
-      leaseRenewDeadline: 1s
-      leaseRetryPeriod: 200ms
+      leaseDuration: 60s
+      leaseRenewDeadline: 10s
+      leaseRetryPeriod: 1s
+    externalIPs:
+      enabled: true
     k8sClientRateLimit:
       qps: 10
       burst: 20
