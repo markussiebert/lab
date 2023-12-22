@@ -46,7 +46,6 @@ spec:
       replicas: '1'
     l2announcements:
       enabled: true
-      interface: eth0
       leaseDuration: 3s
       leaseRenewDeadline: 1s
       leaseRetryPeriod: 200ms
