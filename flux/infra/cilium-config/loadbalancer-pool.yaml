@@ -4,4 +4,4 @@ metadata:
   name: "one-ip-pool"
 spec:
   cidrs:
-  - cidr: "192.168.1.223/32"
+  - cidr: "192.168.1.224/28"
