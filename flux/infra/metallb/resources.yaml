@@ -34,22 +34,22 @@ spec:
         namespace: infra-metallb
       interval: 1h
 ---
-apiVersion: metallb.io/v1beta1
-kind: IPAddressPool
-metadata:
-  name: metallb
-  namespace: infra-metallb
-spec:
-  addresses:
-  - 192.168.1.221/32
-  - 192.168.1.222/32
-  - 192.168.1.223/32
----
-apiVersion: metallb.io/v1beta1
-kind: L2Advertisement
-metadata:
-  name: metallb
-  namespace: infra-metallb
-spec:
-  ipAddressPools:
-  - metallb
+#apiVersion: metallb.io/v1beta1
+#kind: IPAddressPool
+#metadata:
+#  name: metallb
+#  namespace: infra-metallb
+#spec:
+#  addresses:
+#  - 192.168.1.221/32
+#  - 192.168.1.222/32
+#  - 192.168.1.223/32
+#---
+#apiVersion: metallb.io/v1beta1
+#kind: L2Advertisement
+#metadata:
+#  name: metallb
+#  namespace: infra-metallb
+#spec:
+#  ipAddressPools:
+#  - metallb
