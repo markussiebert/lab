@@ -58,6 +58,7 @@ spec:
         repository: tensorchord/pgvecto-rs
         tag: pg14-v0.1.11
       global:
+        storageClass: proxmox-data-xfs
         postgresql:
           auth:
             username: immich
@@ -72,6 +73,8 @@ spec:
               CREATE EXTENSION vectors;
     redis:
       enabled: true
+      global:
+        storageClass: proxmox-data-xfs
       architecture: standalone
       auth:
         enabled: false
