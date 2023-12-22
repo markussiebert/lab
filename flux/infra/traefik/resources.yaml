@@ -29,9 +29,9 @@ spec:
         name: traefik
         namespace: infra-traefik
       interval: 1h
-    values:
-      service:
-        enabled: true
-        labels:
-          cilium-lb-ip-pool: one-ip-pool
+  values:
+    service:
+      enabled: true
+      labels:
+        cilium-lb-ip-pool: one-ip-pool
 ---
