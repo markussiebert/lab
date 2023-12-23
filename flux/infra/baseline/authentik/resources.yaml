@@ -35,6 +35,10 @@ spec:
     name: authentik-helm-values
     valuesKey: postgresql_password
     targetPath: authentik.postgresql.password
+  - kind: Secret
+    name: authentik-helm-values
+    valuesKey: postgresql_password
+    targetPath: postgresql.postgresqlPassword
   values:
     envValueFrom:
       AUTHENTIK_BOOTSTRAP_PASSWORD:
