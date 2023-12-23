@@ -5,4 +5,4 @@ resources:
 - ../../baseline/csi-proxmox
 - ../../baseline/metallb
 - ../../baseline/traefik
-#- ../../baseline/cert-manager
+- ../../baseline/cert-manager
