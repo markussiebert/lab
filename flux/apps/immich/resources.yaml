@@ -96,9 +96,9 @@ spec:
             kubernetes.io/tls-acme: "true"
             cert-manager.io/cluster-issuer: letsencrypt-familie-siebert-de
           tls:
-          - secretName: authentik-general-tls
+          - secretName: immich-general-tls
             hosts:
-            - authentik-stage.familie-siebert.de
+            - immich.stage.familie-siebert.de
     microservices:
       enabled: true
       image:
