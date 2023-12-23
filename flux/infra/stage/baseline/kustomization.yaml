@@ -6,3 +6,5 @@ resources:
 - ../../baseline/metallb
 - ../../baseline/traefik
 - ../../baseline/cert-manager
+- authentik-helm-values.sops.yaml
+- ../../baseline/authentik
