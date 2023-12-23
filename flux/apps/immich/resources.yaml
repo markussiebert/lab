@@ -95,10 +95,10 @@ spec:
             kubernetes.io/ingress.class: traefik
             kubernetes.io/tls-acme: "true"
             cert-manager.io/cluster-issuer: letsencrypt-familie-siebert-de
-          tls: []
-#          - secretName: immich-general-tls
-#            hosts:
-#            - immich.stage.familie-siebert.de
+          tls:
+          - secretName: immich-general-tls
+            hosts:
+            - immich.stage.familie-siebert.de
     microservices:
       enabled: true
       image:
