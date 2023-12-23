@@ -10,7 +10,7 @@ spec:
   sourceRef:
     kind: GitRepository
     name: flux-system
-  path: ./flux/stage/baseline
+  path: ./flux/infra/stage/baseline
   decryption:
     provider: sops
     secretRef:
@@ -27,7 +27,7 @@ spec:
   sourceRef:
     kind: GitRepository
     name: flux-system
-  path: ./flux/stage/config
+  path: ./flux/infra/stage/config
   dependsOn:
     - name: infra
   decryption:
