@@ -91,7 +91,14 @@ spec:
             - host: immich.stage.familie-siebert.de
               paths:
                 - path: "/"
-          tls: []
+          annotations:
+            kubernetes.io/ingress.class: traefik
+            kubernetes.io/tls-acme: "true"
+            cert-manager.io/cluster-issuer: letsencrypt-familie-siebert-de
+          tls:
+          - secretName: authentik-general-tls
+            hosts:
+            - authentik-stage.familie-siebert.de
     microservices:
       enabled: true
       image:
