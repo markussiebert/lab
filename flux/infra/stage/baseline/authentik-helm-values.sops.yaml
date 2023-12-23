@@ -6,7 +6,7 @@ metadata:
 type: Opaque
 stringData:
     secret_key: ENC[AES256_GCM,data:TJchWxJIFJQI3yB9M8hREQF9dYCjjE6eTNL1yl5NPvYUI1zhNxeEOp917yQjPPP1,iv:W6J/N9qHcmmSxonezLTOwXfSgQ8l5ZRr0AHz/9m2+WQ=,tag:IKlHqJw1eGZoTsdvqBqRIA==,type:str]
-    postgresql_password: ENC[AES256_GCM,data:xnhHo3/8BLTa27jygX98NoAEEne74+r+KsufC5FkZlhAj1zWLTcC9tm/3bg8evXz,iv:CwlQsrB6DPvWdSrxarxuqXX3v80o5NzEO8YJtLgdBro=,tag:+losLCXQaJmg+Y7PZZO/0A==,type:str]
+    postgresql_password: ENC[AES256_GCM,data:prskfsmTs0jwzSChnUqgrjN1YORxPfiL9MZoJAosEkk=,iv:K9VDqFEKBqdwQ+zefO4oCUu9fL8lpSmq1NCOgPDIwx4=,tag:QZyPYf0riMUKhpi4Sg+vgA==,type:str]
     AUTHENTIK_BOOTSTRAP_PASSWORD: ENC[AES256_GCM,data:K2hzorcuStNeG66btEOPJUjDrKACJpmP183OorHjZfhCE6RDfQwb52VAH8QJYqty,iv:sNIpdcfexOX/vcNireUMG4DvuQdDiX4T1Ddcs2araGo=,tag:Ydda5q8q5hkZX1r90mmubg==,type:str]
 sops:
     kms: []
@@ -23,8 +23,8 @@ sops:
             alVoRFpYa05rUzBZN2liMkEvS0pmaTAKJaBPaavn4/449cDF8b3mOWpkTjBQuZZZ
             DYEZMcSZU2/bzCBVNMdAoChr4yO0PtZuKdtKkqU3K0TcCzuN2aufDA==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2023-12-23T21:27:16Z"
-    mac: ENC[AES256_GCM,data:NVwqIacC2bLUlSovmUeP/EHZ59bwL9UUom1A3p/QFaH7OvK4QthpiLmvIS6e8ykaAxsoZU/aCTjP1Rggw+D/iiuCAIvLUyujjbf5q04+lT7wbMc64htoCb00GVhHmbm4Bqa6drClpsfQqe8TP3VmCp3qtstf6FNwd8fl5sQrRJE=,iv:4dRcLYclhimld+fCTpUChXD7F45YgJ9n2uthSJy228U=,tag:DJIgepjK5XTmOh9bMPkSQg==,type:str]
+    lastmodified: "2023-12-23T21:58:05Z"
+    mac: ENC[AES256_GCM,data:HvzXOMXCJBGS5tBO6fsB53qVICoUmR2/wXI8T50YaN2QrD7cgnbqUGA/3hQ7+Apcc/RqY0nlkhUops1sskWeFE1S4cWHJBkM1kYm2bFIV7ev1Lgg159GfJaIS+Lf9Gpyy2mev7voSSRF7mYHpfMsx1l4xZCJKgrHoTYq67vm/NI=,iv:T17i+yIz1kKpDd2dwcvnTVLQOGCKPG/6eniKrebg1uc=,tag:5bcWoKca7iZTFup22190IQ==,type:str]
     pgp: []
     encrypted_regex: ^(data|stringData)$
     version: 3.7.3
