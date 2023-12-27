@@ -38,6 +38,7 @@ spec:
         kubernetes.io/tls-acme: "true"
         cert-manager.io/cluster-issuer: letsencrypt-familie-siebert-de
       spec:
+        ingressClassName: traefik
         tls:
         - secretName: netdata-general-tls
           hosts:
