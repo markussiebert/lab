@@ -26,8 +26,8 @@ spec:
       version: "3.7.80"
       sourceRef:
         kind: HelmRepository
-        name: authelia
-        namespace: app-authelia
+        name: netdata
+        namespace: app-netdata
       interval: 1h
   values:
     ingress:
