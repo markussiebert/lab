@@ -32,18 +32,16 @@ spec:
   values:
     ingress:
       enabled: true
-      hosts:
-        - host: netdata.stage.familie-siebert.de
-          paths:
-            - path: "/"
+      hosts: netdata.stage.familie-siebert.de
       annotations:
         kubernetes.io/ingress.class: traefik
         kubernetes.io/tls-acme: "true"
         cert-manager.io/cluster-issuer: letsencrypt-familie-siebert-de
-      tls:
-      - secretName: netdata-general-tls
-        hosts:
-        - netdata.stage.familie-siebert.de
+      spec:
+        tls:
+        - secretName: netdata-general-tls
+          hosts:
+          - netdata.stage.familie-siebert.de
     k8sState:
       persistence:
         storageclass: proxmox-data-xfs
