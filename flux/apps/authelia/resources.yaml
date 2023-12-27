@@ -56,7 +56,7 @@ spec:
       tls:
         enabled: true
         secret: authelia-general-tls
-    configmap:
+    configMap:
       authentication_backend:
         ldap:
           enabled: false
