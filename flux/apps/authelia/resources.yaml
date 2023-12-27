@@ -1,0 +1,47 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: app-authelia
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: authelia-data-dir
+  namespace: app-authelia
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 256Mi
+  storageClassName: proxmox-data-xfs
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: HelmRepository
+metadata:
+  name: authelia
+  namespace: app-authelia
+spec:
+  interval: 1h
+  url: https://charts.authelia.com
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: immich
+  namespace: app-authelia
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: authelia
+      version: "0.8.58"
+      sourceRef:
+        kind: HelmRepository
+        name: authelia
+        namespace: app-authelia
+      interval: 1h
+  values:
+    domain: stage.familie-siebert.de
+  
