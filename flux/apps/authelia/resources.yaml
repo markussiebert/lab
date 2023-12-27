@@ -79,7 +79,7 @@ spec:
           filename: /config/notification.txt
       identity_providers:
         oidc:
-          enabled: true
+          enabled: false
     persistence:
       enabled: true
       storageClass: proxmox-data-xfs
