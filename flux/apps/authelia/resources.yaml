@@ -70,6 +70,9 @@ spec:
           enabled: false
         postgres:
           enabled: false
+      session:
+        redis:
+          enabled: false
       notifier:
         filesystem:
           enabled: true
