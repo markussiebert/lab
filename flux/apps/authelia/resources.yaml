@@ -64,8 +64,8 @@ spec:
           enabled: false
       storage:
         local:
-        enabled: false
-          path: /config/db.sqlite3
+          enabled: false
+            path: /config/db.sqlite3
         mysql:
           enabled: false
         postgres:
