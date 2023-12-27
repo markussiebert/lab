@@ -13,3 +13,4 @@ infra/!jest.config.js
 infra/!setup.js
 infra/!.prettierrc.js
 **/.DS_Store
+**/.decrypted*

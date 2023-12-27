@@ -29,7 +29,7 @@ spec:
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: immich
+  name: authelia
   namespace: app-authelia
 spec:
   interval: 30m
@@ -44,4 +44,46 @@ spec:
       interval: 1h
   values:
     domain: stage.familie-siebert.de
-  
+    ingress:
+      enabled: true
+
+      annotations:
+        kubernetes.io/ingress.class: traefik
+        kubernetes.io/tls-acme: "true"
+        cert-manager.io/cluster-issuer: letsencrypt-familie-siebert-de
+
+      certManager: true
+      rewriteTarget: true
+
+      subdomain: auth
+
+      tls:
+        enabled: true
+        secret: authelia-general-tls
+    configmap:
+      authentication_backend:
+        ldap:
+          enabled: false
+        file:
+          enabled: false
+      storage:
+        local:
+        enabled: false
+          path: /config/db.sqlite3
+        mysql:
+          enabled: false
+        postgres:
+          enabled: false
+      notifier:
+        filesystem:
+          enabled: true
+      filename: /config/notification.txt
+      identity_providers:
+        oidc:
+          ## Enables this in the config map. Currently in beta stage.
+          ## See https://www.authelia.com/r/openid-connect/
+          enabled: true
+    persistence:
+      enabled: true
+      storageClass: proxmox-data-xfs
+
