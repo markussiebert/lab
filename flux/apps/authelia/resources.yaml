@@ -61,7 +61,7 @@ spec:
         ldap:
           enabled: false
         file:
-          enabled: false
+          enabled: true
       storage:
         local:
           enabled: true
@@ -74,6 +74,8 @@ spec:
         redis:
           enabled: false
       notifier:
+        smtp:
+          enabled: false
         filesystem:
           enabled: true
           filename: /config/notification.txt
