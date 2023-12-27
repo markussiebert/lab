@@ -65,7 +65,7 @@ spec:
       storage:
         local:
           enabled: false
-            path: /config/db.sqlite3
+          path: /config/db.sqlite3
         mysql:
           enabled: false
         postgres:
@@ -73,7 +73,7 @@ spec:
       notifier:
         filesystem:
           enabled: true
-      filename: /config/notification.txt
+          filename: /config/notification.txt
       identity_providers:
         oidc:
           enabled: true
