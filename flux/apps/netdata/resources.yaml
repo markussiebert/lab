@@ -47,3 +47,8 @@ spec:
     k8sState:
       persistence:
         storageclass: proxmox-data-xfs
+    parent:
+      database:
+        storageclass: proxmox-data-xfs
+      alarms:
+        storageclass: proxmox-data-xfs
