@@ -46,17 +46,13 @@ spec:
     domain: stage.familie-siebert.de
     ingress:
       enabled: true
-
       annotations:
         kubernetes.io/ingress.class: traefik
         kubernetes.io/tls-acme: "true"
         cert-manager.io/cluster-issuer: letsencrypt-familie-siebert-de
-
       certManager: true
       rewriteTarget: true
-
       subdomain: auth
-
       tls:
         enabled: true
         secret: authelia-general-tls
@@ -80,8 +76,6 @@ spec:
       filename: /config/notification.txt
       identity_providers:
         oidc:
-          ## Enables this in the config map. Currently in beta stage.
-          ## See https://www.authelia.com/r/openid-connect/
           enabled: true
     persistence:
       enabled: true
