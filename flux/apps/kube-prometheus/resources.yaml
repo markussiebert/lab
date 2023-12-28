@@ -125,6 +125,12 @@ spec:
       isDefault: false
       storage:
         type: filesystem
+      singleBinary:
+        replicas: 1
+        persistence:
+          enabled: true
+          size: 10Gi
+          storageClass: proxmox-data-xfs
     promtail:
       enabled: true
   interval: 1h0m0s
