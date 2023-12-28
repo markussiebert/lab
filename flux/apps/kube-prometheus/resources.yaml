@@ -1,0 +1,121 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: monitoring-kube-prometheus-stack
+  labels:
+    pod-security.kubernetes.io/enforce: privileged
+    pod-security.kubernetes.io/audit: privileged
+    pod-security.kubernetes.io/warn: privileged
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: HelmRepository
+metadata:
+  name: kube-prometheus-stack
+  namespace: monitoring-kube-prometheus-stack
+spec:
+  interval: 10m0s
+  url: https://prometheus-community.github.io/helm-charts
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: HelmRepository
+metadata:
+  name: grafana-charts
+  namespace: monitoring-kube-prometheus-stack
+spec:
+  interval: 10m0s
+  url: https://grafana.github.io/helm-charts
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: monitoring-kube-prometheus-stack
+spec:
+  releaseName: kube-prometheus-stack
+  chart:
+    spec:
+      chart: kube-prometheus-stack
+      sourceRef:
+        kind: HelmRepository
+        name: kube-prometheus-stack
+        namespace: monitoring-kube-prometheus-stack
+      version: "55.5.0"
+  values:
+    crds:
+      enabled: true
+    nameOverride: kps
+    fullnameOverride: kps
+    defaultRules:
+      create: true
+      rules:
+        kubeProxy: false
+    grafana:
+      ingress:
+        enabled: true
+        #ingressClassName: traefik
+        annotations:
+          kubernetes.io/ingress.class: traefik
+          kubernetes.io/tls-acme: "true"
+          cert-manager.io/cluster-issuer: letsencrypt-familie-siebert-de
+        hosts:
+          - grafana.stage.familie-siebert.de
+        path: /
+        tls:
+         - secretName: grafana-general-tls
+           hosts:
+           - grafana.stage.familie-siebert.de
+    prometheus:
+      prometheusSpec:
+        storageSpec:
+          volumeClaimTemplate:
+            spec:
+              storageClassName: proxmox-data-xfs
+              accessModes: ["ReadWriteOnce"]
+              resources:
+                requests:
+                  storage: 5Gi
+            selector: {}
+  interval: 1h0m0s
+  install:
+    remediation:
+      retries: 3
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: monitoring-prometheus-adapter
+spec:
+  releaseName: prometheus-adapter
+  chart:
+    spec:
+      chart: prometheus-adapter
+      sourceRef:
+        kind: HelmRepository
+        name: kube-prometheus-stack
+        namespace: monitoring-kube-prometheus-stack
+  interval: 1h0m0s
+  install:
+    remediation:
+      retries: 3
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: monitoring-loki-stack
+spec:
+  releaseName: loki-stack
+  chart:
+    spec:
+      chart: loki-stack
+      sourceRef:
+        kind: HelmRepository
+        name: grafana-charts
+        namespace: monitoring-kube-prometheus-stack
+  values:
+    loki:
+      isDefault: false
+    promtail:
+      enabled: true
+  interval: 1h0m0s
+  install:
+    remediation:
+      retries: 3
