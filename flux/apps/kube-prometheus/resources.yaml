@@ -64,6 +64,13 @@ spec:
          - secretName: grafana-general-tls
            hosts:
            - grafana.stage.familie-siebert.de
+      persistence:
+        enabled: true
+        type: pvc
+        storageClassName: proxmox-data-xfs
+        accessModes:
+        - ReadWriteOnce
+        size: 1Gi
     prometheus:
       prometheusSpec:
         storageSpec:
@@ -116,6 +123,8 @@ spec:
   values:
     loki:
       isDefault: false
+      storage:
+        type: filesystem
     promtail:
       enabled: true
   interval: 1h0m0s
