@@ -29,6 +29,7 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: monitoring-kube-prometheus-stack
+  namespace: monitoring-kube-prometheus-stack
 spec:
   releaseName: kube-prometheus-stack
   chart:
@@ -83,6 +84,7 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: monitoring-prometheus-adapter
+  namespace: monitoring-kube-prometheus-stack
 spec:
   releaseName: prometheus-adapter
   chart:
@@ -101,6 +103,7 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: monitoring-loki-stack
+  namespace: monitoring-kube-prometheus-stack
 spec:
   releaseName: loki-stack
   chart:
